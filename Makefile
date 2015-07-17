@@ -9,8 +9,8 @@ include $(BASEDIR)/Rules.mk
 
 #------------------------------------------------------------------------------
 
-#SUBDIRS			:= scripts drivers lib util
-SUBDIRS			:= util
+#SUBDIRS			:= scripts lib
+SUBDIRS			:= drivers util
 						
 #------------------------------------------------------------------------------
 

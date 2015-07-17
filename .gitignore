@@ -1,0 +1,11 @@
+.*.swp
+.*.cmd
+*.o
+*.ko
+*.order
+*.mod.c
+drivers/.tmp_versions
+drivers/Module.symvers
+scripts/env.pf
+util/hello.c/helloc
+util/hello.cpp/hellocpp

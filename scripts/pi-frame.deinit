@@ -1,0 +1,49 @@
+#!/bin/sh
+
+#----------------------------------------------------------
+# Init
+#----------------------------------------------------------
+SYSROOT=/system
+if [ ! -z "$PF_OUTPUT_DIR" ] ; then
+  SYSROOT=$PF_OUTPUT_DIR/x86/system
+fi
+SYSBIN=$SYSROOT/bin
+SYSDRV=$SYSROOT/driver
+SYSLIB=$SYSROOT/lib
+
+export LD_LIBRARY_PATH=$SYSLIB:$LD_LIBRARY_PATH
+
+
+#------------------------------------------------------------------------------
+# Configuration
+#------------------------------------------------------------------------------
+CONFIG_MEMORY_NAME="PFConfig"
+CONFIG_MEMORY_SIZE=65536
+EVT_Q_NAME="q.event"
+EVT_Q_SIZE=65536
+EVT_Q_PSIZE=256
+WD_Q_NAME="q.watchdog"
+WD_Q_SIZE=65536
+WD_Q_PSIZE=128
+
+
+#------------------------------------------------------------------------------
+# Remove Queue
+#------------------------------------------------------------------------------
+$SYSBIN/vmqctl -c remove -n $EVT_Q_NAME 2> /dev/null
+$SYSBIN/vmqctl -c remove -n $WD_Q_NAME 2> /dev/null
+
+
+#------------------------------------------------------------------------------
+# Remvoe Shared memory for configuration
+#------------------------------------------------------------------------------
+$SYSBIN/vmshmctl -c remove -n $CONFIG_MEMORY_NAME
+
+
+#------------------------------------------------------------------------------
+# Unload drivers for framework
+#------------------------------------------------------------------------------
+rmmod vmq
+rmmod vmshm
+
+

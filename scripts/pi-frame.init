@@ -1,0 +1,56 @@
+#!/bin/sh
+
+#----------------------------------------------------------
+# Init
+#----------------------------------------------------------
+SYSROOT=/system
+if [ ! -z "$PF_OUTPUT_DIR" ] ; then
+  SYSROOT=$PF_OUTPUT_DIR/$MODEL/system
+fi
+SYSBIN=$SYSROOT/bin
+SYSDRV=$SYSROOT/driver
+SYSLIB=$SYSROOT/lib
+
+export LD_LIBRARY_PATH=$SYSLIB:$LD_LIBRARY_PATH
+
+
+#------------------------------------------------------------------------------
+# Load drivers for framework
+#------------------------------------------------------------------------------
+insmod $SYSDRV/vmshm.ko
+insmod $SYSDRV/vmq.ko
+
+
+#------------------------------------------------------------------------------
+# Configuration
+#------------------------------------------------------------------------------
+CONFIG_MEMORY_NAME="PFConfig"
+CONFIG_MEMORY_SIZE=65536
+EVT_Q_NAME="q.event"
+EVT_Q_SIZE=524288
+EVT_Q_PSIZE=512
+WD_Q_NAME="q.watchdog"
+WD_Q_SIZE=65536
+WD_Q_PSIZE=128
+
+
+#------------------------------------------------------------------------------
+# Queue
+#------------------------------------------------------------------------------
+# Remove Queue
+$SYSBIN/vmqctl -c remove -n $EVT_Q_NAME 2> /dev/null
+$SYSBIN/vmqctl -c remove -n $WD_Q_NAME 2> /dev/null
+# Create Queue
+$SYSBIN/vmqctl -c create -n $EVT_Q_NAME -s $EVT_Q_SIZE -p $EVT_Q_PSIZE
+$SYSBIN/vmqctl -c create -n $WD_Q_NAME -s $WD_Q_SIZE -p $WD_Q_PSIZE
+
+
+#------------------------------------------------------------------------------
+# Shared memory for configuration
+#------------------------------------------------------------------------------
+# Remove Config
+$SYSBIN/vmshmctl -c remove -n $CONFIG_MEMORY_NAME
+# Create Config
+$SYSBIN/vmshmctl -c create -n $CONFIG_MEMORY_NAME -s $CONFIG_MEMORY_SIZE
+
+
