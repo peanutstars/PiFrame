@@ -1,0 +1,54 @@
+#!/bin/sh
+
+PFCMD="$1"
+BASEDIR=/system
+BINDIR=$BASEDIR/bin
+LIBDIR=$BASEDIR/lib
+DRVDIR=$BASEDIR/driver
+SCRDIR=$BASEDIR/scripts
+DEFDIR=$BASEDIR/default
+SUDO=
+
+fEcho() {
+	echo -e "!! $1"
+}
+
+fInit() {
+	fEcho "INIT"
+	. $SCRDIR/pf-env
+	if [[ $EUID -ne 0 ]]; then
+		SUDO=sudo
+	fi
+}
+
+fStart() {
+	fEcho "START BEGIN"
+	_RV=`lsmod | grep vmq`
+	if [ x"$_RV" == x"" ] ; then
+		$SUDO $SCRDIR/pi-frame.init
+	fi
+	fEcho "START END"
+}
+
+fStop() {
+	fEcho "STOP BEGIN"
+	fEcho "STOP END"
+}
+
+###################################################
+# Main
+
+fInit
+
+case "$PFCMD" in
+	start)
+		fStart
+	;;  
+	stop)
+		fStop
+	;;
+	*)  
+	echo "Usage: $0 {start|stop}"
+	exit 1
+	;;  
+esac

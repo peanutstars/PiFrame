@@ -8,10 +8,13 @@ export BASEDIR MODEL
 
 #------------------------------------------------------------------------------
 
+PF_ENV_FILE	:= pf-env
+
 SCRIPT_FILES := \
 				pi-frame.init \
 				pi-frame.deinit \
-				pfrun
+				pf-run \
+				$(PF_ENV_FILE)
 
 
 INSTALLDIR		:=$(TARGETDIR)/system/scripts
@@ -24,13 +27,13 @@ install:	all
 	cp -af $(SCRIPT_FILES) $(INSTALLDIR)
 
 clean:
-	rm env.pf
+	rm $(PF_ENV_FILE)
 
 distclean:	clean
 	rm -rf $(INSTALLDIR)/*
 
 make_source.inform:
-	@./genEnvFile.sh
+	@./genPfEnv.sh
 
 
 #------------------------------------------------------------------------------

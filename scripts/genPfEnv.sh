@@ -1,7 +1,7 @@
 #!/bin/bash
 
 RULES_FILE=$BASEDIR/Rules.mk
-SRC_FILE=./env.pf
+SRC_FILE=./pf-env
 
 INFO_RELEASE=1
 INFO_VERSION="0.00"
