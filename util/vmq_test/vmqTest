@@ -1,0 +1,43 @@
+#!/bin/sh
+
+VMENV=/system/script/vm.env
+
+[ -e "$VMENV" ] && [ -z "$INFO_MODEL" ] && source $VMENV
+
+
+fMsg() {
+	echo -e "@@ $1"
+}
+
+fMsg "#####################################################################"
+fMsg "Send Notify Test : Run 1 EA"
+vmq_test -m 2 -t 0 -i 0 -e
+
+fMsg "#####################################################################"
+fMsg "Send Notify Test : Run 4 EA at once - For Testing Context Switch"
+vmq_test -m 2 -t 0 -i 0 &
+vmq_test -m 2 -t 0 -i 0 &
+vmq_test -m 2 -t 0 -i 0 &
+sleep 1
+vmq_test -m 2 -t 0 -i 0 -e
+
+sleep 5
+
+fMsg "############################"
+fMsg "Notify Send/ Event Receive"
+vmq_test -m 1 &
+sleep 1
+vmq_test -m 2 -t 0 -i 0 -e
+
+
+sleep 5
+
+fMsg "############################"
+fMsg "Notify Send 2 EA / Event Receive 1 EA"
+vmq_test -m 1 &
+sleep 1
+vmq_test -m 2 -t 0 -i 0 &
+sleep 1
+vmq_test -m 2 -t 0 -i 0 -e
+
+sleep 5
