@@ -27,7 +27,6 @@ install:	all
 	cp -af $(SCRIPT_FILES) $(INSTALLDIR)
 
 clean:
-	rm $(PF_ENV_FILE)
 
 distclean:	clean
 	rm -rf $(INSTALLDIR)/*

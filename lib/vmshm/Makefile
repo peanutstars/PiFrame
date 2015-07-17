@@ -2,18 +2,19 @@
 #------------------------------------------------------------------------------
 
 ifndef	BASEDIR
-BASEDIR			:=$(shell pwd)
+BASEDIR			:=$(shell pwd)/../..
 endif
-WHOAMI			:=$(shell whoami)
 include $(BASEDIR)/Rules.mk
 
 #------------------------------------------------------------------------------
 
-SUBDIRS			:= scripts drivers lib util
-						
+TARGET			:=libvmshm.so
+OBJS			:=vmshm.o
+INSTALLDIR		:=$(TARGETDIR)/system/lib
+
+EXTRA_CFLAGS	+=-fPIC -fpic
+EXTRA_LFLAGS	+=-shared -Wl,-soname,$(TARGET)
+
 #------------------------------------------------------------------------------
 
 include $(BASEDIR)/build/Rules.common
-
-remove-target:
-	@rm -rf $(PF_OUTPUT_DIR)

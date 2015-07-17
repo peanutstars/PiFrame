@@ -22,8 +22,8 @@ CFLAGS		+=-DMODEL_$(MODEL)
 #------------------------------------------------------------------------------
 
 EXTRA_CFLAGS	+=-I$(BASEDIR)/include
-EXTRA_CFLAGS	+=-I$(BASEDIR)/driver/vmq
-EXTRA_CFLAGS	+=-I$(BASEDIR)/driver/vmshm
+EXTRA_CFLAGS	+=-I$(BASEDIR)/drivers/vmq
+EXTRA_CFLAGS	+=-I$(BASEDIR)/drivers/vmshm
 EXTRA_CFLAGS	+=-I$(BASEDIR)/external/include
 
 LFLAGS			+=-L$(BASEDIR)/external/lib
