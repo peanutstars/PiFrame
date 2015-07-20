@@ -46,7 +46,12 @@ int eventHandler(void)
 	struct PFEvent *event;
 	int run = 1;
 
-	while((event = (struct PFEvent *)VMQueueGetItem(eventQ, NULL)) != NULL) {
+#if 0
+	while( run && (event = (struct PFEvent *)VMQueueGetItem(eventQ, NULL)) != NULL) 
+#else
+	if ((event = (struct PFEvent *)VMQueueGetItem(eventQ, NULL)) != NULL)
+#endif
+	{
 
 		//	DBG("event->id = %X, PFE_TEST_CHAR = %X\n", event->id, PFE_TEST_CHAR);
 		switch(event->id) {
@@ -98,6 +103,7 @@ int eventHandler(void)
 				}
 			case	PFE_TEST_END:
 				{
+					DBG("Event ( PFE_TEST_END )\n");
 					run = 0;
 					break;
 				}

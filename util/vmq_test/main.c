@@ -66,9 +66,10 @@ static void run(void)
 	pollfd[0].fd = eventGetFd();
 	pollfd[0].events = POLLIN;
 
+	DBG("Receiver [ Start ]\n");
 	for( ; ; )
 	{
-		if(!fgRun)
+		if( ! fgRun)
 			break;
 
 		ret = poll(pollfd, 1, POLL_TIMEOUT);
@@ -83,8 +84,12 @@ static void run(void)
 
 		if(pollfd[0].revents & POLLIN) {
 			fgRun = eventHandler();
+			if ( ! fgRun) {
+				DBG("ZERO !!!\n");
+			}
 		}
 	}
+	DBG("Receiver [ End ]\n");
 
 	eventDumpStatistic();
 }
@@ -243,7 +248,7 @@ void *thread_notify (void *args)
 			}   
 			pthread_mutex_unlock(&lock);
 		} else {
-			if (count >= 100000) {
+			if (count >= 1000000) {
 				break;
 			}
 		}
@@ -277,8 +282,11 @@ void *thread_notify (void *args)
 	DBG("Estimated Time : %ld.%06ld\n", now.tv_sec, now.tv_usec);
 
 	if ( nsecInterval == 0 && opt->sendEnd ) {
-		notifyNoData (PFE_TEST_END);
-		fgRun = 0;
+		DBG("Notify( PFE_TEST_END )\n");
+		notifyNoData (PFE_TEST_END) ;
+		fgRun = 0 ;
+	} else if ( nsecInterval == 0 ) {
+		fgRun = 0 ;
 	}
 
 	return NULL;
@@ -295,10 +303,12 @@ int main(int argc, char **argv)
 	signalInit();
 	if (opt->etype & ET_SENDER) {
 		notifyInit();
+		DBG("SENDER\n");
 	    pthread_create(&thid, NULL, thread_notify, (void *)opt);
 	    pthread_detach(thid);
 	}
 	if (opt->etype & ET_RECEIVER) {
+		DBG("RECEIVER\n");
 		eventInit();
 		run();
 	}
