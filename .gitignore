@@ -10,4 +10,8 @@ drivers/Module.symvers
 scripts/pf-env
 util/hello.c/helloc
 util/hello.cpp/hellocpp
+util/vmq_test/vmq_test
+util/vmqctl/vmqctl
+util/vmshm_test/vmshm_test
+util/vmshmctl/vmshmctl
 target/
