@@ -1,23 +1,25 @@
 #ifndef __PF_DEFINE__H__
 #define __PF_DEFINE__H__
 
-#define PF_DEF_USER_CONFIG_DIR		"/data/config"
-#define PF_DEF_DEFAULT_CONFIG_DIR	"/system/default"
-#define PF_DEF_CONFIG_TMP_DIR		"/tmp/config"
+#define PF_DEF_USER_CONFIG_DIR			"/data/config"
+#define PF_DEF_DEFAULT_CONFIG_DIR		"/system/default"
+#define PF_DEF_CONFIG_TMP_DIR			"/tmp/config"
 
-#define PF_DEF_UDEV_ID_BUS			"ID_BUS"
-#define PF_DEF_UDEV_ID_MODEL		"ID_MODEL"
-#define PF_DEF_UDEV_ID_VENDOR		"ID_VENDOR"
-#define PF_DEF_UDEV_ID_SERIAL_SHORT	"ID_SERIAL_SHORT"
-#define PF_DEF_UDEV_DEVTYPE			"DEVTYPE"
-#define PF_DEF_UDEV_DEVPATH			"DEVPATH"
-#define PF_DEF_UDEV_ACTION			"ACTION"
-#define PF_DEF_UDEV_DEVNAME			"DEVNAME"
-#define PF_DEF_UDEV_MAJOR			"MAJOR"
-#define PF_DEF_UDEV_MINOR			"MINOR"
-#define PF_DEF_UDEV_INTERFACE		"INTERFACE"
+#define PF_DEF_UDEV_ID_BUS				"ID_BUS"
+#define PF_DEF_UDEV_ID_MODEL			"ID_MODEL"
+#define PF_DEF_UDEV_ID_VENDOR			"ID_VENDOR"
+#define PF_DEF_UDEV_ID_SERIAL_SHORT		"ID_SERIAL_SHORT"
+#define PF_DEF_UDEV_DEVTYPE				"DEVTYPE"
+#define PF_DEF_UDEV_DEVPATH				"DEVPATH"
+#define PF_DEF_UDEV_ACTION				"ACTION"
+#define PF_DEF_UDEV_DEVNAME				"DEVNAME"
+#define PF_DEF_UDEV_MAJOR				"MAJOR"
+#define PF_DEF_UDEV_MINOR				"MINOR"
+#define PF_DEF_UDEV_INTERFACE			"INTERFACE"
 
-#define PF_DEF_SERVICE_PORT_NFS		2049
+#define PF_DEF_SERVICE_PORT_NFS			2049
+#define PF_DEF_WATCHDOG_PERIOD			5				// Second
+#define PF_DEF_MARK_WATCHDOG_DISABLE	"/tmp/disable_watchdog"
 
 enum EPF_FILESYSTEM {
 	EPF_FS_UNKNOWN = -1,
