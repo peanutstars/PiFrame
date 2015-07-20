@@ -251,7 +251,7 @@ void *thread_notify (void *args)
 		switch (opt->dtype)
 		{
 		case DT_NONE:
-			notifyNoData (VME_TEST);
+			notifyNoData (PFE_TEST);
 			break;
 		case DT_CHAR:
 			notifyChar (count);
@@ -277,7 +277,7 @@ void *thread_notify (void *args)
 	DBG("Estimated Time : %ld.%06ld\n", now.tv_sec, now.tv_usec);
 
 	if ( nsecInterval == 0 && opt->sendEnd ) {
-		notifyNoData (VME_TEST_END);
+		notifyNoData (PFE_TEST_END);
 		fgRun = 0;
 	}
 

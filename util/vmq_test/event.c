@@ -6,10 +6,10 @@
 
 
 #include "vmq.h"
-#include "vmlimit.h"
-#include "vmevent.h"
-#include "vmconfig.h"
-#include "debug.h"
+#include "pflimit.h"
+#include "pfevent.h"
+#include "pfconfig.h"
+#include "pfdebug.h"
 
 /*****************************************************************************/
 
@@ -21,7 +21,7 @@ static unsigned int _statCount[5] = { 0, 0, 0, 0, 0 };
 void eventInit(void)
 {
 	ASSERT(!eventQ);
-	eventQ = VMQueueOpen(VME_QUEUE_NAME, VMQ_MODE_CONSUMER);
+	eventQ = VMQueueOpen(PFE_QUEUE_NAME, VMQ_MODE_CONSUMER);
 	ASSERT(eventQ);
 }
 
@@ -43,60 +43,60 @@ int eventGetFd(void)
 #define DUMP_ACTIVE_COUNT		(500)
 int eventHandler(void)
 {
-	struct VMEvent *event;
+	struct PFEvent *event;
 	int run = 1;
 
-	while((event = (struct VMEvent *)VMQueueGetItem(eventQ, NULL)) != NULL) {
+	while((event = (struct PFEvent *)VMQueueGetItem(eventQ, NULL)) != NULL) {
 
-		//	DBG("event->id = %X, VME_TEST_CHAR = %X\n", event->id, VME_TEST_CHAR);
+		//	DBG("event->id = %X, PFE_TEST_CHAR = %X\n", event->id, PFE_TEST_CHAR);
 		switch(event->id) {
-			case	VME_TEST:
+			case	PFE_TEST:
 				{
 					_statCount[0] ++;
-					//			struct VMETest *test = (struct VMETest *)event;
+					//			struct PFETest *test = (struct PFETest *)event;
 					//			if (_statCount[0]++ > DUMP_ACTIVE_COUNT) {
-					//				DBG("%5d] %08X %10d - VME_TEST\n", getpid(), test->id, test->sec);
+					//				DBG("%5d] %08X %10d - PFE_TEST\n", getpid(), test->id, test->sec);
 					//				_statCount[0] = 0;
 					//			}
 					break;
 				}
-			case	VME_TEST_CHAR:
+			case	PFE_TEST_CHAR:
 				{
-					struct VMETestChar *test = (struct VMETestChar *)event;
+					struct PFETestChar *test = (struct PFETestChar *)event;
 					if (_statCount[1]++ > DUMP_ACTIVE_COUNT) {
-						DBG("%5d] %08X %10d - VME_TEST_CHAR  %2X\n", getpid(), test->id, test->sec, test->data);
+						DBG("%5d] %08X %10d - PFE_TEST_CHAR  %2X\n", getpid(), test->id, test->sec, test->data);
 						_statCount[1] = 0;
 					}
 					break;
 				}
-			case	VME_TEST_SHORT:
+			case	PFE_TEST_SHORT:
 				{
-					struct VMETestShort *test = (struct VMETestShort *)event;
+					struct PFETestShort *test = (struct PFETestShort *)event;
 					if (_statCount[2]++ > DUMP_ACTIVE_COUNT) {
-						DBG("%5d] %08X %10d - VME_TEST_SHORT %4X\n", getpid(), test->id, test->sec, test->data);
+						DBG("%5d] %08X %10d - PFE_TEST_SHORT %4X\n", getpid(), test->id, test->sec, test->data);
 						_statCount[2] = 0;
 					}
 					break;
 				}
-			case	VME_TEST_INT:
+			case	PFE_TEST_INT:
 				{
-					struct VMETestInt *test = (struct VMETestInt *)event;
+					struct PFETestInt *test = (struct PFETestInt *)event;
 					if (_statCount[3]++ > DUMP_ACTIVE_COUNT) {
-						DBG("%5d] %08X %10d - VME_TEST_INT   %8X\n", getpid(), test->id, test->sec, test->data);
+						DBG("%5d] %08X %10d - PFE_TEST_INT   %8X\n", getpid(), test->id, test->sec, test->data);
 						_statCount[3] = 0;
 					}
 					break;
 				}
-			case	VME_TEST_LONG:
+			case	PFE_TEST_LONG:
 				{
-					struct VMETestLong *test = (struct VMETestLong *)event;
+					struct PFETestLong *test = (struct PFETestLong *)event;
 					if (_statCount[4]++ > DUMP_ACTIVE_COUNT) {
-						DBG("%5d] %08X %10d - VME_TEST_LONG  %16lX\n", getpid(), test->id, test->sec, test->data);
+						DBG("%5d] %08X %10d - PFE_TEST_LONG  %16lX\n", getpid(), test->id, test->sec, test->data);
 						_statCount[4] = 0;
 					}
 					break;
 				}
-			case	VME_TEST_END:
+			case	PFE_TEST_END:
 				{
 					run = 0;
 					break;

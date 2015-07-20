@@ -13,9 +13,9 @@
 #include <errno.h>
 
 #include "vmshm.h"
-#include "vmconfig.h"
+#include "pfconfig.h"
 
-#include "debug.h"
+#include "pfdebug.h"
 
 /*****************************************************************************/
 
@@ -36,8 +36,8 @@ static void initConfig(void)
 	int flags;
 	const char *name = "VMConfig";
 
-	if(getenv("VM_CONFIG_NAME") != NULL)
-		name = getenv("VM_CONFIG_NAME");
+	if(getenv("PF_CONFIG_NAME") != NULL)
+		name = getenv("PF_CONFIG_NAME");
 
 	fd = open(VMSHM_DEVICE, O_RDWR);
 	ASSERT(fd > 0);
@@ -50,10 +50,10 @@ static void initConfig(void)
 
 //	config = (struct VMConfig *)mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
 	config = (struct VMConfig *)mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-	__DD_DBG("config = %p, &config=%p\n", config, &config);
+	DBG("config = %p, &config=%p\n", config, &config);
 	ASSERT(config != MAP_FAILED);
 
-	semid = semget((key_t)VM_CONFIG_KEY, 0, 0);
+	semid = semget((key_t)PF_CONFIG_KEY, 0, 0);
 	ASSERT(semid >= 0);
 }
 

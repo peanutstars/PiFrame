@@ -104,6 +104,7 @@ struct PFETestLong {
 #define PFE_TEST_SHORT				MKEID(EPF_MOD_TEST, 2, struct PFETestShort)
 #define PFE_TEST_INT				MKEID(EPF_MOD_TEST, 3, struct PFETestInt)
 #define PFE_TEST_LONG				MKEID(EPF_MOD_TEST, 4, struct PFETestLong)
+#define PFE_TEST_END				MKEID(EPF_MOD_TEST, 5, struct PFETest)
 
 /******************************************************************************
  * Event Lists

@@ -2,10 +2,10 @@
 #include <assert.h>
 
 #include "vmq.h"
-#include "vmevent.h"
+#include "pfevent.h"
 
 #include "notify.h"
-#include "debug.h"
+#include "pfdebug.h"
 
 /*****************************************************************************/
 
@@ -19,7 +19,7 @@ static struct VMQueue *eventQ;
  */
 void notifyInit(void)
 {
-	eventQ = VMQueueOpen(VME_QUEUE_NAME, VMQ_MODE_PRODUCER);
+	eventQ = VMQueueOpen(PFE_QUEUE_NAME, VMQ_MODE_PRODUCER);
 	ASSERT(eventQ);
 }
 
@@ -34,12 +34,12 @@ void notifyExit(void)
 
 void notifyNoData (int type)
 {
-	struct VMETest *event;
+	struct PFETest *event;
 
 	event = VMQueueGetBufferWithKey (eventQ, sizeof(*event));
 	ASSERT(event);
 
-	VME_INIT_EVENT(event, type);
+	PFE_INIT_EVENT(event, type);
 
 //	DBG("Key = %X\n", event->key);
 	VMQueuePutBuffer (eventQ, event);
@@ -47,12 +47,12 @@ void notifyNoData (int type)
 
 void notifyChar (unsigned char data)
 {
-	struct VMETestChar *event;
+	struct PFETestChar *event;
 
 	event = VMQueueGetBuffer (eventQ, sizeof(*event));
 	ASSERT(event);
 
-	VME_INIT_EVENT(event, (VME_TEST_CHAR));
+	PFE_INIT_EVENT(event, (PFE_TEST_CHAR));
 	event->data = data;
 
 	DBG("Key = %X, data = %X\n", event->key, data);
@@ -61,12 +61,12 @@ void notifyChar (unsigned char data)
 
 void notifyShort (unsigned short data)
 {
-	struct VMETestShort *event;
+	struct PFETestShort *event;
 
 	event = VMQueueGetBufferWithKey (eventQ, sizeof(*event));
 	ASSERT(event);
 
-	VME_INIT_EVENT(event, (VME_TEST_SHORT));
+	PFE_INIT_EVENT(event, (PFE_TEST_SHORT));
 	event->data = data;
 
 	DBG("Key = %X\n", event->key);
@@ -75,12 +75,12 @@ void notifyShort (unsigned short data)
 
 void notifyInt (unsigned int data)
 {
-	struct VMETestInt *event;
+	struct PFETestInt *event;
 
 	event = VMQueueGetBuffer (eventQ, sizeof(*event));
 	ASSERT(event);
 
-	VME_INIT_EVENT(event, (VME_TEST_INT));
+	PFE_INIT_EVENT(event, (PFE_TEST_INT));
 	event->data = data;
 
 	DBG("Key = %X\n", event->key);
@@ -89,12 +89,12 @@ void notifyInt (unsigned int data)
 
 void notifyLong (unsigned long data)
 {
-	struct VMETestLong *event;
+	struct PFETestLong *event;
 
 	event = VMQueueGetBufferWithKey (eventQ, sizeof(*event));
 	ASSERT(event);
 
-	VME_INIT_EVENT(event, (VME_TEST_LONG));
+	PFE_INIT_EVENT(event, (PFE_TEST_LONG));
 	event->data = data;
 
 	DBG("Key = %X\n", event->key);
