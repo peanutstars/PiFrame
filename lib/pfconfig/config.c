@@ -48,8 +48,7 @@ static void initConfig(void)
 	size = VMSharedMemorySelect(fd, name);
 	ASSERT(size > 0);
 
-//	config = (struct PFConfig *)mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
-	config = (struct PFConfig *)mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	config = (struct PFConfig *)mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
 	DBG("config = %p, &config=%p\n", config, &config);
 	ASSERT(config != MAP_FAILED);
 

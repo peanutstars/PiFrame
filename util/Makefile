@@ -6,8 +6,7 @@ include $(BASEDIR)/Rules.mk
 
 #------------------------------------------------------------------------------
 
-#SUBDIRS		:= vmqctl vmshmctl vmq_test vmshm_test
-SUBDIRS		:= vmqctl vmshmctl vmq_test
+SUBDIRS		:= vmqctl vmshmctl vmq_test vmshm_test
 
 #------------------------------------------------------------------------------
 

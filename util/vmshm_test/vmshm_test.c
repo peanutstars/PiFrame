@@ -51,28 +51,28 @@ static void semaInit(void)
 
 static void dump_vmconfig (int index)
 {
-	struct VMConfig *config;
+	struct PFConfig *config;
 	int i;
 
-	config = (struct VMConfig *)VMConfigGet();
+	config = (struct PFConfig *)PFConfigGet();
 
 	printf ("%2d) ", index);
 	for (i=0; i<9; i++)
 		printf ("%9d ", config->dummy[i]);
 		printf ("\n");
 
-	VMConfigPut (config);
+	PFConfigPut (config);
 }
 
 #define LOOP_COUNT		1000
 void *thread_main (void *args)
 {
-	struct VMConfig *config;
+	struct PFConfig *config;
 	int index = *(int *)args;
 	int i;
 
-	config = (struct VMConfig *)VMConfigGet();
-	VMConfigPut (config);
+	config = (struct PFConfig *)PFConfigGet();
+	PFConfigPut (config);
 	/* 혼자 사용하는 영역 */
 	for (i=0; i<LOOP_COUNT; i++)
 	{
@@ -84,24 +84,24 @@ void *thread_main (void *args)
 int main (int argc, char *argv[])
 {
 	pthread_t thid;
-	struct VMConfig *config;
+	struct PFConfig *config;
 	int i;
 	int index = atoi (argv[1]);
 
-	printf ("index = %d, sizeof(struct VMConfig) = %zd\n", index, sizeof(struct VMConfig));
+	printf ("index = %d, sizeof(struct PFConfig) = %zd\n", index, sizeof(struct PFConfig));
 
 	if (index == 1) {
 		semaInit();
-		config = (struct VMConfig *)VMConfigGet();
+		config = (struct PFConfig *)PFConfigGet();
 		memset ((void *)config, 0, sizeof(*config));
-		VMConfigPut(config);
+		PFConfigPut(config);
 	}
 	else {
 		sleep(2);
 	}
 
-	config = (struct VMConfig *)VMConfigGet();
-	VMConfigPut(config);
+	config = (struct PFConfig *)PFConfigGet();
+	PFConfigPut(config);
 
 	printf ("config = %p\n", config);
 	pthread_create (&thid, NULL, thread_main, (void *)(&index));
@@ -110,11 +110,11 @@ int main (int argc, char *argv[])
 	/* 공통 사용하는 영역 */
 	for (i=0; i<LOOP_COUNT; i++)
 	{
-		config = (struct VMConfig *)VMConfigGet();
+		config = (struct PFConfig *)PFConfigGet();
 
 		config->dummy[0] ++;
 
-		VMConfigPut(config);
+		PFConfigPut(config);
 	}
 
 	while (config->dummy[index] != LOOP_COUNT)

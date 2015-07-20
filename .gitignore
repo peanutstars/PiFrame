@@ -2,6 +2,7 @@
 .*.cmd
 *.o
 *.ko
+*.so
 *.order
 *.mod.c
 drivers/.tmp_versions
