@@ -30,7 +30,7 @@ typedef enum
 	ERV_FAIL_NODEV,
 	ERV_FAIL_PARAM,
 	ERV_FAIL_TIMEOUT,
-	ERV_RESULT_END
+	ERV_RESULT_COUNT
 } EResult ;
 
 /*****************************************************************************/

@@ -39,6 +39,20 @@ struct PFTypeUdevNetwork {
 	char		action[MAX_DUMMY_LENGTH] ;
 };
 
+struct PFTypeFSCapacity {
+	uint32_t    total;          /* kbytes */
+	uint32_t    used;           /* kbytes */
+	uint32_t    empty;          /* kbytes */
+	float       usedPercent;    /* 0.0% */
+};
+struct PFTypePartInfo {
+	char    devname[MAX_DEVICE_LENGTH];
+	char    mountPoint[MAX_BASE_PATH_LENGTH];
+	int32_t  fsType;
+	uint32_t fsRO;
+	struct PFTypeFSCapacity fsCap;
+};
+
 
 
 #ifdef	__cplusplus

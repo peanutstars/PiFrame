@@ -8,6 +8,7 @@
 #define	MAX_EMAIL_COUNT					8
 #define	MAX_LOG_COUNT					1000
 #define MAX_FILE_LIST_COUNT				(2048)
+#define MAX_ATA_PART_COUNT				4
 
 #define MAX_DUMMY_LENGTH				16
 #define	MAX_VERSION_LENGTH				32
@@ -31,5 +32,7 @@
 #define MAX_MESSAGE_LENGTH				128
 #define MAX_PARAM_LENGTH				512
 #define MAX_KMSG_LENGTH					512
+#define MAX_FILE_BUFFER_SIZE			(8*1024)
+
 
 #endif	/*__PF_LIMIT_H__*/
