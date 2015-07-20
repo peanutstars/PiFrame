@@ -8,8 +8,8 @@ include $(BASEDIR)/Rules.mk
 
 #------------------------------------------------------------------------------
 
-TARGET			:=libpfconfig.so
-OBJS			:=pfconfig.o
+TARGET			:=libvmwdt.so
+OBJS			:=pfwdt.o
 INSTALLDIR		:=$(TARGETDIR)/system/lib
 
 EXTRA_CFLAGS	+=-fPIC -fpic

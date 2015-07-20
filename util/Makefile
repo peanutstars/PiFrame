@@ -6,6 +6,7 @@ include $(BASEDIR)/Rules.mk
 
 #------------------------------------------------------------------------------
 
+#SUBDIRS	:= helloc hellocpp
 SUBDIRS		:= vmqctl vmshmctl vmq_test vmshm_test
 
 #------------------------------------------------------------------------------

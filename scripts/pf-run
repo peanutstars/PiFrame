@@ -13,6 +13,14 @@ fEcho() {
 	echo -e "!! $1"
 }
 
+fLoadDriver() {
+	_RV=`lsmod | grep vmq`
+	if [ x"$_RV" == x"" ] ; then
+		$SUDO $SCRDIR/pi-frame.init
+	fi
+	[ -n "$SUDO" ] && $SUDO chmod 0666 /dev/vmq /dev/vmshm
+}
+
 fInit() {
 	fEcho "INIT"
 	. $SCRDIR/pf-env
@@ -23,10 +31,7 @@ fInit() {
 
 fStart() {
 	fEcho "START BEGIN"
-	_RV=`lsmod | grep vmq`
-	if [ x"$_RV" == x"" ] ; then
-		$SUDO $SCRDIR/pi-frame.init
-	fi
+	fLoadDriver
 	fEcho "START END"
 }
 
