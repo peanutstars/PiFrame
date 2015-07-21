@@ -1,6 +1,7 @@
 #ifndef	__PF_EVENT_H__
 #define	__PF_EVENT_H__
 
+#include <stdint.h>
 #include <time.h>
 #include "pfconfig.h"
 #include "pfsvc.h"
@@ -89,7 +90,7 @@ struct PFETestChar {
 struct PFETestShort {
 	__PFE_STRUCT__ ;
 	unsigned short	data ;
-};
+} ;
 struct PFETestInt {
 	__PFE_STRUCT__ ;
 	unsigned int	data ;
@@ -109,12 +110,31 @@ struct PFETestLong {
 /******************************************************************************
  * Event Lists
  *****************************************************************************/
+struct PFESystem {
+    __PFE_STRUCT__ ;
+} ;
+
+enum ESYS_SHUTDOWN_TYPE {
+	ESYS_SHUTDOWN_REBOOT       = 0x74800814,
+	ESYS_SHUTDOWN_POWEROFF,
+} ;
+
+struct PFESystemShutdown {
+    __PFE_STRUCT__ ;
+    uint32_t	type ;
+    uint32_t	waitSecound ;
+} ;
+
+#define PFE_SYS_DUMMY               MKEID(EPF_MOD_SYSTEM, 0, struct PFESystem)
+#define PFE_SYS_POWER_OFF           MKEID(EPF_MOD_SYSTEM, 1, struct PFESystem)
+#define PFE_SYS_SHUTDOWN            MKEID(EPF_MOD_SYSTEM, 2, struct PFESystemShutdown)
+
 /******************************************************************************
  * Service Config
  *****************************************************************************/
 struct PFEConfigUpdate {
 	__PFE_STRUCT__;
-	int classId;
+	int eConfigType ;
 };
 
 #define PFE_CONFIG_UPDATE			MKEID(EPF_MOD_CONFIG, 0, struct PFEConfigUpdate)

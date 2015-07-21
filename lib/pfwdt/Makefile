@@ -8,7 +8,7 @@ include $(BASEDIR)/Rules.mk
 
 #------------------------------------------------------------------------------
 
-TARGET			:=libvmwdt.so
+TARGET			:=libpfwdt.so
 OBJS			:=pfwdt.o
 INSTALLDIR		:=$(TARGETDIR)/system/lib
 

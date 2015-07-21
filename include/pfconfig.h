@@ -18,6 +18,7 @@ extern "C" {
 
 struct PFBaseInfo {
 	int release ;
+	int rescue ;
 	char version[MAX_VERSION_LENGTH] ;
 	char model[MAX_NAME_LENGTH] ;
 	char dummy[MAX_DUMMY_LENGTH] ;

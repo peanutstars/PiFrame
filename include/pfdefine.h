@@ -1,6 +1,11 @@
 #ifndef __PF_DEFINE__H__
 #define __PF_DEFINE__H__
 
+#define PF_DEF_BOOT_INFO_RELEASE		"INFO_RELEASE"
+#define PF_DEF_BOOT_INFO_VERSION		"INFO_VERSION"
+#define PF_DEF_BOOT_INFO_MODEL			"INFO_MODEL"
+#define PF_DEF_BOOT_INFO_RESCUE			"RESCUE"
+
 #define PF_DEF_USER_CONFIG_DIR			"/data/config"
 #define PF_DEF_DEFAULT_CONFIG_DIR		"/system/default"
 #define PF_DEF_CONFIG_TMP_DIR			"/tmp/config"
@@ -21,7 +26,7 @@
 #define PF_DEF_WATCHDOG_PERIOD			5				// Second
 #define PF_DEF_MARK_WATCHDOG_DISABLE	"/tmp/disable_watchdog"
 
-enum EPF_FILESYSTEM {
+enum EPF_FILESYSTEM_TYPE {
 	EPF_FS_UNKNOWN = -1,
 	EPF_FS_FAT = 0,
 	EPF_FS_EXFAT,
@@ -35,14 +40,13 @@ enum EPF_FILESYSTEM {
 	EPF_FS_NFS,
 	EPF_FS_END
 } ;
-typedef enum EPF_FILESYSTEM EpfFileSystem ;
+typedef enum EPF_FILESYSTEM_TYPE EpfFileSystem ;
 
 enum EPF_CONFIG_TYPE {
-	EPF_CT_SYSTEM = 0,
-	EPF_CT_NETWORK,
-	EPF_CT_MEDIA,
-	EPF_CT_RUNTIME,
-	EPF_CT_COUNT
+	EPF_CONFIG_SYSTEM = 0,
+	EPF_CONFIG_NETWORK,
+	EPF_CONFIG_RUNTIME,
+	EPF_CONFIG_COUNT
 } ;
 #define PF_CONFIG_MASK(x)			(1<<(x))
 
