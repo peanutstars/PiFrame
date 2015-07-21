@@ -1,0 +1,40 @@
+#!/bin/bash
+
+ARCHIVE_FILE=cJSONFiles.zip
+SRC_DIR=cJSON
+INSTALL_DIR=..
+
+extract_archive() {
+	7z -y x cJSONFiles.zip &> /dev/null
+	if [ ."$?" != ."0" ]; then
+		echo "# Archive extrace error !!"
+		exit 1
+	fi
+}
+
+build_source() {
+	make -C $SRC_DIR
+	if [ ."$?" != ."0" ]; then
+		echo "# Build Error !!"
+		exit 1
+	fi
+}
+
+install_source() {
+	DIR_INCLUDE=$INSTALL_DIR/include
+	DIR_LIB=$INSTALL_DIR/lib
+	if [ ."$DIR_INCLUDE" != ."" ]; then install -d $DIR_INCLUDE $DIR_LIB; fi
+	if [ ."$DIR_INCLUDE" != ."" ]; then install $SRC_DIR/libcjson.so $DIR_LIB; fi
+	if [ ."$DIR_INCLUDE" != ."" ]; then install $SRC_DIR/cJSON.h $DIR_INCLUDE; fi
+}
+
+remove_extrace() {
+	rm -rf __MACOSX $SRC_DIR
+}
+
+# Start
+extract_archive
+build_source
+install_source
+remove_extrace
+

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+COUNT_BUILD=0
+
+function build()
+{
+	echo "###################################################"
+	echo "# BUILD : $1"
+	echo "###################################################"
+#	/bin/bash $1 2>&1 > /dev/null
+	/bin/bash $1
+	return $?
+}
+
+
+#####################################
+# Environment Information
+#
+echo
+echo "# ARCH            : $ARCH"
+echo "# MODEL           : $MODEL"
+echo "# CROSS_COMPILE   : $CROSS_COMPILE"
+echo "# BUILD_MODEL     : $BUILD_MODEL"
+echo
+
+#####################################
+# pre build
+#
+
+for F in $PREBUILD_LISTS
+do
+	build $F.build
+	if [ "$?" != "0" ]; then
+		echo "######################################"
+		echo "# Build Error : $F"
+		echo
+		exit 1;
+	fi
+	let "COUNT_BUILD = COUNT_BUILD + 1"
+done
+
+echo $MODEL > $BUILD_MODEL
+echo $COUNT_BUILD > $BUILD_COUNT

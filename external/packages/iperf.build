@@ -1,0 +1,40 @@
+#!/bin/bash
+
+ARCHIVE_FILE=iperf-2.0.5.tar.gz
+SRC_DIR=iperf-2.0.5
+INSTALL_DIR=../..
+
+extract_archive() {
+	tar xzvf $ARCHIVE_FILE
+	if [ ."$?" != ."0" ]; then
+		echo "# Archive extrace error !!"
+		exit 1
+	fi
+}
+
+build_source() {
+	ac_cv_func_malloc_0_nonnull=yes ./configure --host=${BUILD_HOST} --prefix=`pwd`/_install && make && make install
+	if [ ."$?" != ."0" ]; then
+		echo "# Build Error !!"
+		exit 1
+	fi
+}
+
+install_source() {
+	DIR_BIN=$INSTALL_DIR/bin
+	install -d $DIR_BIN
+	install _install/bin/iperf $DIR_BIN
+}
+
+remove_extrace() {
+	rm -rf $SRC_DIR
+}
+
+# Start
+extract_archive
+cd $SRC_DIR
+build_source
+install_source
+cd -
+remove_extrace
+
