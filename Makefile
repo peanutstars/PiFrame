@@ -9,7 +9,12 @@ include $(BASEDIR)/Rules.mk
 
 #------------------------------------------------------------------------------
 
-SUBDIRS			:= scripts drivers external lib util
+SUBDIRS			:= scripts \
+				   drivers \
+				   external \
+				   lib \
+				   util \
+				   default
 						
 #------------------------------------------------------------------------------
 
