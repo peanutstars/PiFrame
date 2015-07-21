@@ -1,0 +1,14 @@
+{
+	"basic": {
+		"interface": "WIRED",
+		"type": "DHCP",
+		"devWired": "eth0"
+	},
+	"staticIp": {
+		"ipaddr": "192.168.1.50",
+		"netmask": "255.255.0.0",
+		"gateway": "192.168.0.1",
+		"dns1": "168.126.63.1",
+		"dns1": "8.8.8.8"
+	}
+}

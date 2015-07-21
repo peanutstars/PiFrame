@@ -1,0 +1,23 @@
+{
+	"name": "CamPi",
+	"subModel": "Normal",
+	"timezone": {
+		"gmtOff" : "9:00",
+		"zone" : "KST",
+		"id" : "Asia/Seoul",
+		"name" : "Seoul"
+	},
+	"ntp": {
+		"enable": true,
+		"serverList": ["pool.ntp.org", "time.windows.com" ]
+	},
+	"info": {
+		"pathDefConfig": "/system/config/CamPi",
+		"pathConfig": "/data/config",
+		"baseODD": "/mnt/odd",
+		"baseATA": "/mnt/ata",
+		"baseUSB": "/mnt/usb",
+		"baseNET": "/mnt/net",
+		"prefixUSB": "media"
+	}
+}

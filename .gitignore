@@ -7,6 +7,10 @@
 *.mod.c
 drivers/.tmp_versions
 drivers/Module.symvers
+external/bin/iperf
+external/include/
+external/packages/.build_count
+external/packages/.build_model
 scripts/pf-env
 util/hello.c/helloc
 util/hello.cpp/hellocpp
@@ -16,3 +20,4 @@ util/vmshm_test/vmshm_test
 util/vmshmctl/vmshmctl
 target/
 tags
+
