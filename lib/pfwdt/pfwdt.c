@@ -22,7 +22,7 @@ static struct PFWDInfo wdi = {
 		.pid		= 0,
 		.name		= "\0",
 		.params		= "\0",
-		.eMode		= PFWD_MODE_NONE,
+		.eMode		= EPFWD_MODE_NONE,
 		.timeout	= 0,
 	}
 };
@@ -42,7 +42,7 @@ static void doSendWDPacket (struct PFWDInfo *pWDI, uint32_t wdid, void *edata, i
 	VMQueuePutBuffer (pWDI->eventQ, packet);
 }
 
-static void fillInfo (struct PFWDInfo *pWDI, int argc, char *argv[], emode_vmwd_t eMode, int timeout)
+static void fillInfo (struct PFWDInfo *pWDI, int argc, char *argv[], EPfWDMode eMode, int timeout)
 {
 	char params[MAX_PARAM_LENGTH] = "";
 	int len = 0;
@@ -65,7 +65,7 @@ static void fillInfo (struct PFWDInfo *pWDI, int argc, char *argv[], emode_vmwd_
 }
 
 
-int PFWatchdogRegister (int argc, char *argv[], emode_vmwd_t eMode, int timeout)
+int PFWatchdogRegister (int argc, char *argv[], EPfWDMode eMode, int timeout)
 {
 	struct PFWDInfo *pWDI = &wdi;
 	int rv = -1;
@@ -77,7 +77,7 @@ int PFWatchdogRegister (int argc, char *argv[], emode_vmwd_t eMode, int timeout)
 		ASSERT (pWDI->eventQ);
 
 		fillInfo (pWDI, argc, argv, eMode, timeout);
-		doSendWDPacket (pWDI, PFWD_REGISTER, &pWDI->info, sizeof(pWDI->info));
+		doSendWDPacket (pWDI, EPFWD_CMD_REGISTER, &pWDI->info, sizeof(pWDI->info));
 
 		rv = 0;
 	}
@@ -90,7 +90,7 @@ int PFWatchdogUnregister (void)
 	int rv = -1;
 	
 	if (pWDI->eventQ) {
-		doSendWDPacket (pWDI, PFWD_UNREGISTER, &pWDI->info, sizeof(struct PFWDUnregister));
+		doSendWDPacket (pWDI, EPFWD_CMD_UNREGISTER, &pWDI->info, sizeof(struct PFWDUnregister));
 		usleep(200000);
 		rv = 0;
 	} else {
@@ -106,7 +106,7 @@ int PFWatchdogStart (void)
 	int rv = -1;
 	
 	if (pWDI->eventQ) {
-		doSendWDPacket (pWDI, PFWD_START, &pWDI->info, sizeof(struct PFWDUnregister));
+		doSendWDPacket (pWDI, EPFWD_CMD_START, &pWDI->info, sizeof(struct PFWDUnregister));
 		rv = 0;
 	} else {
 		ERR("WD is not registered.\n");
@@ -121,7 +121,7 @@ int PFWatchdogStop (void)
 	int rv = -1;
 	
 	if (pWDI->eventQ) {
-		doSendWDPacket (pWDI, PFWD_STOP, &pWDI->info, sizeof(struct PFWDUnregister));
+		doSendWDPacket (pWDI, EPFWD_CMD_STOP, &pWDI->info, sizeof(struct PFWDUnregister));
 		rv = 0;
 	} else {
 		ERR("WD is not registered.\n");
@@ -136,7 +136,7 @@ int PFWatchdogAlive (void)
 	int rv = -1;
 	
 	if (pWDI->eventQ) {
-		doSendWDPacket (pWDI, PFWD_ALIVE, &pWDI->info, sizeof(struct PFWDUnregister));
+		doSendWDPacket (pWDI, EPFWD_CMD_ALIVE, &pWDI->info, sizeof(struct PFWDUnregister));
 		rv = 0;
 	} else {
 		ERR("WD is not registered.\n");
@@ -159,7 +159,7 @@ int PFWatchdog_subRegister (uint32_t *subId, int timeout)
 
 		/* Critical Session */
 		memcpy (packet, &pWDI->info, sizeof(struct PFWatchdog));
-		packet->wdid = PFWD_SUB_REGISTER;
+		packet->wdid = EPFWD_CMD_SUBREGISTER;
 		packet->subId = *subId = (getpid()<<16)|(pWDI->subCount++ & 0xFFFF);
 		packet->timeout = timeout;
 
@@ -184,7 +184,7 @@ int PFWatchdog_subUnregister (uint32_t subId)
  
 		/* Critical Area */
 		memcpy (packet, &pWDI->info, sizeof(struct PFWatchdog));
-		packet->wdid = PFWD_SUB_UNREGISTER;
+		packet->wdid = EPFWD_CMD_SUBUNREGISTER;
 		packet->subId = subId;
 
 		VMQueuePutBuffer (pWDI->eventQ, packet);
@@ -208,7 +208,7 @@ int PFWatchdog_subAlive (uint32_t subId)
  
 		/* Critical Area */
 		memcpy (packet, &pWDI->info, sizeof(struct PFWatchdog));
-		packet->wdid = PFWD_SUB_ALIVE;
+		packet->wdid = EPFWD_CMD_SUBALIVE;
 		packet->subId = subId;
 
 		VMQueuePutBuffer (pWDI->eventQ, packet);
@@ -244,7 +244,7 @@ struct VMWdtHandler *PFWatchdogSubRegister (int timeout)
 
 		/* Critical Session */
 		memcpy (packet, &pWDI->info, sizeof(struct PFWatchdog));
-		packet->wdid = PFWD_SUB_REGISTER;
+		packet->wdid = EPFWD_CMD_SUBREGISTER;
 		packet->subId = handle->subId = (getpid()<<16)|(pWDI->subCount++ & 0xFFFF);
 		packet->timeout = timeout;
 
@@ -270,7 +270,7 @@ int PFWatchdogSubUnregister (struct VMWdtHandler *handle)
 
 			/* Critical Area */
 			memcpy (packet, &pWDI->info, sizeof(struct PFWatchdog));
-			packet->wdid = PFWD_SUB_UNREGISTER;
+			packet->wdid = EPFWD_CMD_SUBUNREGISTER;
 			packet->subId = handle->subId;
 			memset (handle, 0, sizeof(*handle));
 
@@ -305,7 +305,7 @@ int PFWatchdogSubAlive (struct VMWdtHandler *handle, int period)
 
 				/* Critical Area */
 				memcpy (packet, &pWDI->info, sizeof(struct PFWatchdog));
-				packet->wdid = PFWD_SUB_ALIVE;
+				packet->wdid = EPFWD_CMD_SUBALIVE;
 				packet->subId = handle->subId;
 				handle->wdt_ts = ts;
 

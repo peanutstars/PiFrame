@@ -6,9 +6,11 @@
 extern "C" {
 #endif	/*__cplusplus*/
 
+#include "pfwatchdog.h"
+
 struct PFWdtHandler;
 
-int PFWatchdogRegister (int argc, char *argv[], emode_vmwd_t eMode, int timeout);
+int PFWatchdogRegister (int argc, char *argv[], EPfWDMode eMode, int timeout);
 int PFWatchdogUnregister (void);
 int PFWatchdogStart (void);
 int PFWatchdogStop (void);

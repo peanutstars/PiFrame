@@ -57,16 +57,16 @@ struct PFConfigSystem {
 
 /*****************************************************************************/
 
-enum ENetworkBasicInterface {
-	EPFC_NBI_NONE		= 0,
-	EPFC_NBI_WIRED,
-	EPFC_NBI_WIRELESS,
-	EPFC_NBI_END
+enum ENET_INTERFACE_TYPE {
+	EPFC_NI_NONE		= 0,
+	EPFC_NI_WIRED,
+	EPFC_NI_WIRELESS,
+	EPFC_NI_COUNT
 } ;
-enum NetworkBasicType {
-	EPFC_NBT_DHCP		= 0,
-	EPFC_NBT_STATIC,
-	EPFC_NBT_END
+enum ENET_CONNECTION_TYPE {
+	EPFC_NC_DHCP		= 0,
+	EPFC_NC_STATIC,
+	EPFC_NC_COUNT
 } ;
 
 struct PFConfigNetworkBasic {

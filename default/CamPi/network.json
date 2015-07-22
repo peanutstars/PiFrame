@@ -1,7 +1,7 @@
 {
 	"basic": {
 		"interface": "WIRED",
-		"type": "DHCP",
+		"connection": "DHCP",
 		"devWired": "eth0"
 	},
 	"staticIp": {
