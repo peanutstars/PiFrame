@@ -34,10 +34,10 @@ static void initConfig(void)
 	int fd;
 	int size;
 	int flags;
-	const char *name = "PFConfig";
+	const char *name = PFCONFIG_NAME ;
 
-	if(getenv("PF_CONFIG_NAME") != NULL)
-		name = getenv("PF_CONFIG_NAME");
+	if(getenv("PFCONFIG_NAME") != NULL)
+		name = getenv("PFCONFIG_NAME");
 
 	fd = open(VMSHM_DEVICE, O_RDWR);
 	ASSERT(fd > 0);
@@ -53,7 +53,7 @@ static void initConfig(void)
 	DBG("config = %p, &config=%p\n", config, &config);
 	ASSERT(config != MAP_FAILED);
 
-	semid = semget((key_t)PF_CONFIG_KEY, 0, 0);
+	semid = semget((key_t)PFCONFIG_KEY, 0, 0);
 	ASSERT(semid >= 0);
 }
 

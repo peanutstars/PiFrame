@@ -11,8 +11,8 @@ extern "C" {
 
 /*****************************************************************************/
 
-#define	PF_CONFIG_KEY					0x35465170U
-#define	PF_CONFIG_NAME					"PFConfig"
+#define	PFCONFIG_KEY					0x35465170U
+#define	PFCONFIG_NAME					"PFConfig"
 
 /*****************************************************************************/
 
