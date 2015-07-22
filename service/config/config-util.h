@@ -40,10 +40,8 @@ void config_write_iterate (cJSON *, struct ConfigHandler *, struct PFConfig *);
 
 /*****************************************************************************/
 
-struct VMConfigSystemTimezone;
+struct PFConfigSystemTimezone;
 
 int config_set_timezone (const char *tzId);
-void config_save_maintain_tz (const struct VMConfigSystemTimezone *tz);
-int config_load_maintain_tz (struct VMConfigSystemTimezone *tz);
 
 #endif	/*__SETUP_UTIL_H__*/

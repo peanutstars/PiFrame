@@ -6,14 +6,11 @@
 #include <sys/time.h>
 
 #include "cJSON.h"
-#include "vmdefine.h"
-#include "vmconfig.h"
-#include "vmutil.h"
-#include "vmutilSystem.h"
-#include "vmutilAvcrc.h"
+#include "pfdefine.h"
+#include "pfconfig.h"
 #include "config-common.h"
 #include "config-util.h"
-#include "debug.h"
+#include "pfdebug.h"
 
 
 /*****************************************************************************/
@@ -189,99 +186,3 @@ int config_set_timezone (const char *tzId)
 	return rv;
 }
 
-struct ConfigTimeZone {
-	struct VMConfigSystemTimezone tz;
-	uint32_t crc;
-};
-
-static uint32_t config_get_tz_crc (const struct VMConfigSystemTimezone *tz)
-{
-	return VMUAvCRC (NULL, 0x54495a4f, (const unsigned char *)tz, sizeof(*tz));
-}
-static void config_set_tz_crc (struct ConfigTimeZone *ctz)
-{
-	struct VMConfigSystemTimezone tz;
-
-	memset (&tz, 0, sizeof(tz));
-	snprintf(tz.gmtOff, sizeof(tz.gmtOff), "%s", ctz->tz.gmtOff);
-	snprintf(tz.zone, sizeof(tz.zone), "%s", ctz->tz.zone);
-	snprintf(tz.id, sizeof(tz.id), "%s", ctz->tz.id);
-	snprintf(tz.name, sizeof(tz.name), "%s", ctz->tz.name);
-
-	ctz->crc = config_get_tz_crc (&ctz->tz);
-}
-
-static void config_set_ctz (struct ConfigTimeZone *ctz, const struct VMConfigSystemTimezone *tz)
-{
-	memset (ctz, 0, sizeof(*ctz));
-	snprintf(ctz->tz.gmtOff, sizeof(ctz->tz.gmtOff), "%s", tz->gmtOff);
-	snprintf(ctz->tz.zone, sizeof(ctz->tz.zone), "%s", tz->zone);
-	snprintf(ctz->tz.id, sizeof(ctz->tz.id), "%s", tz->id);
-	snprintf(ctz->tz.name, sizeof(ctz->tz.name), "%s", tz->name);
-	
-	ctz->crc = config_get_tz_crc (&ctz->tz);
-}
-
-void config_save_maintain_tz (const struct VMConfigSystemTimezone *tz)
-{
-	char tzinfo[2048];
-
-	struct ConfigTimeZone load_ctz;
-	struct ConfigTimeZone new_ctz;
-
-	memset (&load_ctz, 0, sizeof(load_ctz));
-	config_load_maintain_tz (&load_ctz.tz);
-	config_set_tz_crc (&load_ctz);
-	config_set_ctz (&new_ctz, tz);
-
-	if (memcmp(&load_ctz, &new_ctz, sizeof(load_ctz))) {
-		snprintf (tzinfo, sizeof(tzinfo), 
-				"%s\n"
-				"%s\n"
-				"%s\n"
-				"%s\n"
-				"%08X\n", tz->gmtOff, tz->zone, tz->id, tz->name, new_ctz.crc);
-	
-		VMUSysMkdir(VM_DEF_MAINTAIN_PATH);
-		VMUFileWriteString(VM_DEF_MAINTAIN_TZ_FILE, tzinfo);
-	} else {
-		DBG("It is the same timezone as maintain.tz contents\n");
-	}
-}
-
-int config_load_maintain_tz (struct VMConfigSystemTimezone *tz)
-{
-	int rv = 0;
-	struct ConfigTimeZone ctz;
-	struct VMConfigSystemTimezone load_tz;
-	uint32_t crc;
-
-	FILE *fp = fopen(VM_DEF_MAINTAIN_TZ_FILE, "r");
-	DBG("TZ BF : %s:%s:%s:%s\n", tz->gmtOff, tz->zone, tz->id, tz->name);
-	if (fp) {
-		fgets(load_tz.gmtOff, sizeof(load_tz.gmtOff), fp);
-		VMUStrRtrim(load_tz.gmtOff);
-
-		fgets(load_tz.zone, sizeof(load_tz.zone), fp);
-		VMUStrRtrim(load_tz.zone);
-
-		fgets(load_tz.id, sizeof(load_tz.id), fp);
-		VMUStrRtrim(load_tz.id);
-
-		fgets(load_tz.name, sizeof(load_tz.name), fp);
-		VMUStrRtrim(load_tz.name);
-
-		config_set_ctz (&ctz, &load_tz);
-		fscanf (fp, "%08X", &crc);
-
-		if (crc == ctz.crc) {
-			memcpy (tz, &ctz.tz, sizeof(*tz));
-			rv = 1;
-			DBG("TZ loaded from maintain.tz\n");
-		};
-
-		fclose (fp);
-	}
-	DBG("TZ AF : %s:%s:%s:%s\n", tz->gmtOff, tz->zone, tz->id, tz->name);
-	return rv;
-}

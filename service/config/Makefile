@@ -9,13 +9,11 @@ include $(BASEDIR)/Rules.mk
 TARGET			:= svc.config
 OBJS			:= config.o \
 				   event.o \
-				   notify.o
-
-
-#				   main.o \
+				   notify.o \
+				   config-util.o \
 				   config-system.o \
 				   config-network.o \
-				   config-util.o 
+				   main.o
 
 INSTALLDIR		:=$(TARGETDIR)/system/bin
 

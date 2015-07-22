@@ -10,15 +10,15 @@
 #include <assert.h>
 
 #include "vmq.h"
-#include "vmconfig.h"
-#include "vmevent.h"
-#include "vmwdt.h"
+#include "pfconfig.h"
+#include "pfevent.h"
+#include "pfwdt.h"
 
 #include "config.h"
 #include "event.h"
 #include "notify.h"
-#include "debug.h"
-#include "vmutilSystem.h"
+#include "pfdebug.h"
+//#include "vmutilSystem.h"
 
 /*****************************************************************************/
 
@@ -69,12 +69,11 @@ static void run(void)
 
 int main(int argc, char **argv)
 {
-	VMWatchdogRegister (argc, argv, VMWD_MODE_REBOOT, 30);
+	PFWatchdogRegister (argc, argv, EPFWD_MODE_REBOOT, 30);
 
-//	VMLogInit(SERVICE_NAME);
 	notifyInit();
 	configEventInit();
-	configInit(VM_CONFIG_NAME);
+	configInit(PFCONFIG_NAME);
 
 	run();
 
@@ -83,8 +82,8 @@ int main(int argc, char **argv)
 	
 	configUpdate(1);
 
-	VMWatchdogUnregister ();
-	VMUSysUmount ("/data");
+	PFWatchdogUnregister ();
+
 	return 0;
 }
 

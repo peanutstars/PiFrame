@@ -125,12 +125,12 @@ static void semaInit(void)
 	DBG("Config Size = %zd\n", sizeof(*Config));
 	DBG("==========================\n");
 
-	ConfigSemID = semget((key_t)PF_CONFIG_KEY, 1, IPC_CREAT|IPC_EXCL|0660);
+	ConfigSemID = semget((key_t)PFCONFIG_KEY, 1, IPC_CREAT|IPC_EXCL|0660);
 	if(ConfigSemID < 0) {
 		if(errno != EEXIST) {
 			ASSERT(! "semget must succeed, buf failed.");
 		}
-		ConfigSemID = semget((key_t)PF_CONFIG_KEY, 0, 0);
+		ConfigSemID = semget((key_t)PFCONFIG_KEY, 0, 0);
 		ASSERT(ConfigSemID >= 0);
 		/* 이미 존재 한다면 이전에 생성해 두었기 때문이다. 
 		 * 초기화를 하지 않는다. */

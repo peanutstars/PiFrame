@@ -168,7 +168,6 @@ void updateConfigSystemTimezone (const struct VMConfigSystemTimezone *tz)
 	if ( memcmp(&config->system.tz, tz, sizeof(*tz)) ) {
 		memcpy (&config->system.tz, tz, sizeof(*tz));
 		diff = 1;
-		config_save_maintain_tz (tz);
 		config_set_timezone (config->system.tz.id);
 	}
 	configPut (VM_CONFIG_MASK(VM_CONFIG_SYSTEM));

@@ -2,20 +2,25 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "vmconfig.h"
-#include "vmdefine.h"
-#include "vmutil.h"
-//#include "logger.h"
+#include "pfdefine.h"
+#include "pfconfig.h"
+#include "pfunet.h"
 
 #include "config-common.h"
 #include "config-util.h"
-#include "debug.h"
+#include "pfdebug.h"
 
 /*****************************************************************************/
 
+#define NET_DEFAULT_IP				"192.168.100.74"
+#define NET_DEFAULT_NETMASK			"255.255.255.0"
+#define NET_DEFAULT_GATEWAY			"192.168.100.1"
+#define NET_DEFAULT_DNS1			"168.126.63.1"
+#define NET_DEFAULT_DNS2			"8.8.8.8"
+
 #define NETWORK_BASIC				"basic"
 #define NETWORK_BASIC_INTERFACE		"interface"
-#define NETWORK_BASIC_TYPE			"type"
+#define NETWORK_BASIC_CONNECTION	"connection"
 #define NETWORK_BASIC_DEV_WIRED		"devWired"
 
 #define NETWORK_STATICIP			"staticIp"
@@ -28,20 +33,20 @@
 
 /*****************************************************************************/
 
-static const char *basic_interface_table[VMC_NBI_END] = {
+static const char *basic_interface_table[EPFC_NI_COUNT] = {
 	"NONE",
 	"WIRED",
-//	"WIRELESS"
+	"WIRELESS"
 };
 
-static const char *basic_type_table[VMC_NBT_END] = {
+static const char *basic_type_table[EPFC_NC_COUNT] = {
 	"DHCP",
 	"STATIC"
 };
 
 /*****************************************************************************/
 
-static void rf_network_basic(cJSON *node, struct VMConfig *config)
+static void rf_network_basic(cJSON *node, struct PFConfig *config)
 {
 	char *jvalue;
 	int i;
@@ -49,7 +54,7 @@ static void rf_network_basic(cJSON *node, struct VMConfig *config)
 	/* interface */
 	jvalue = json_getValueSibling (node, NETWORK_BASIC_INTERFACE);
 	if ( jvalue ) {
-		for ( i=0; i<VMC_NBI_END; i++)
+		for ( i=0; i<EPFC_NI_COUNT; i++)
 		{
 			if ( ! strcasecmp(jvalue, basic_interface_table[i]) ) {
 				config->network.basic.netif= i;
@@ -61,9 +66,9 @@ static void rf_network_basic(cJSON *node, struct VMConfig *config)
 	DBG("Interface = %s\n", basic_interface_table[config->network.basic.netif]);
 
 	/* type */
-	jvalue = json_getValueSibling (node, NETWORK_BASIC_TYPE);
+	jvalue = json_getValueSibling (node, NETWORK_BASIC_CONNECTION);
 	if ( jvalue ) {
-		for (i=0; i<VMC_NBT_END; i++)
+		for (i=0; i<EPFC_NC_COUNT; i++)
 		{
 			if ( ! strcasecmp(jvalue, basic_type_table[i]) ) {
 				config->network.basic.type = i;
@@ -92,7 +97,7 @@ static void staticIp_setConfig (cJSON *node, const char *key, char *value, const
 	jvalue = json_getValueSibling (node, key);
 	if ( jvalue )
 	{
-		if ( VMUNetIsValidStrIPv4(jvalue) ) {
+		if ( PFU_isValidStrIPv4(jvalue) ) {
 			strncpy (value, jvalue, MAX_ADDR_LENGTH);
 			value[strlen(jvalue)] = '\0';
 			fgApplyDefValue = 0;
@@ -107,60 +112,60 @@ static void staticIp_setConfig (cJSON *node, const char *key, char *value, const
 		strcpy (value, defvalue);
 }
 
-static void rf_network_staticIp (cJSON *node, struct VMConfig *config)
+static void rf_network_staticIp (cJSON *node, struct PFConfig *config)
 {
 	/* ipaddr */
-	staticIp_setConfig (node, NETWORK_STATICIP_IPADDR, config->network.staticIp.ipaddr, "192.168.100.253");
+	staticIp_setConfig (node, NETWORK_STATICIP_IPADDR, config->network.staticIp.ipaddr, NET_DEFAULT_IP) ;
 //	DBG("ipaddr = %s\n", config->network.staticIp.ipaddr);
 
 	/* netmask */
-	staticIp_setConfig (node, NETWORK_STATICIP_NETMASK, config->network.staticIp.netmask, "255.255.0.0");
+	staticIp_setConfig (node, NETWORK_STATICIP_NETMASK, config->network.staticIp.netmask, NET_DEFAULT_NETMASK) ;
 //	DBG("netmask = %s\n", config->network.staticIp.netmask);
 
 	/* gateway */
-	staticIp_setConfig (node, NETWORK_STATICIP_GATEWAY, config->network.staticIp.gateway, "192.168.100.1");
+	staticIp_setConfig (node, NETWORK_STATICIP_GATEWAY, config->network.staticIp.gateway, NET_DEFAULT_GATEWAY) ;
 //	DBG("gateway = %s\n", config->network.staticIp.gateway);
 
 	/* dns */
-	staticIp_setConfig (node, NETWORK_STATICIP_DNS1, config->network.staticIp.dns1, "168.126.63.1");
-	staticIp_setConfig (node, NETWORK_STATICIP_DNS2, config->network.staticIp.dns2, "8.8.8.8");
+	staticIp_setConfig (node, NETWORK_STATICIP_DNS1, config->network.staticIp.dns1, NET_DEFAULT_DNS1) ;
+	staticIp_setConfig (node, NETWORK_STATICIP_DNS2, config->network.staticIp.dns2, NET_DEFAULT_DNS2) ;
 	DBG("dns = %s, %s\n", config->network.staticIp.dns1, config->network.staticIp.dns2);
 }
 
 /******************************************************************************/
 
-static void wf_network_basic (cJSON *root, struct VMConfig *config)
+static void wf_network_basic (cJSON *root, struct PFConfig *config)
 {
 	cJSON *item = cJSON_CreateObject();
 
-	ASSERT(config->network.basic.netif< VMC_NBI_END);
+	ASSERT(config->network.basic.netif< EPFC_NI_COUNT);
 	cJSON_AddStringToObject (item, NETWORK_BASIC_INTERFACE, basic_interface_table[config->network.basic.netif]);
 
-	ASSERT(config->network.basic.type < VMC_NBT_END);
-	cJSON_AddStringToObject (item, NETWORK_BASIC_TYPE, basic_type_table[config->network.basic.type]);
+	ASSERT(config->network.basic.type < EPFC_NC_COUNT);
+	cJSON_AddStringToObject (item, NETWORK_BASIC_CONNECTION, basic_type_table[config->network.basic.type]);
 
 	cJSON_AddStringToObject (item, NETWORK_BASIC_DEV_WIRED, config->network.basic.devWired);
 
 	cJSON_AddItemToObject (root, NETWORK_BASIC, item);
 }
 
-static void wf_network_staticIp (cJSON *root, struct VMConfig *config)
+static void wf_network_staticIp (cJSON *root, struct PFConfig *config)
 {
 	cJSON *item = cJSON_CreateObject();
 
-	ASSERT(VMUNetIsValidStrIPv4(config->network.staticIp.ipaddr));
+	ASSERT(PFU_isValidStrIPv4(config->network.staticIp.ipaddr));
 	cJSON_AddStringToObject (item, NETWORK_STATICIP_IPADDR, config->network.staticIp.ipaddr);
 
-	ASSERT(VMUNetIsValidStrIPv4(config->network.staticIp.netmask));
+	ASSERT(PFU_isValidStrIPv4(config->network.staticIp.netmask));
 	cJSON_AddStringToObject (item, NETWORK_STATICIP_NETMASK, config->network.staticIp.netmask);
 
-	ASSERT(VMUNetIsValidStrIPv4(config->network.staticIp.gateway));
+	ASSERT(PFU_isValidStrIPv4(config->network.staticIp.gateway));
 	cJSON_AddStringToObject (item, NETWORK_STATICIP_GATEWAY, config->network.staticIp.gateway);
 
-	ASSERT(VMUNetIsValidStrIPv4(config->network.staticIp.dns1));
+	ASSERT(PFU_isValidStrIPv4(config->network.staticIp.dns1));
 	cJSON_AddStringToObject (item, NETWORK_STATICIP_DNS1, config->network.staticIp.dns1);
 	
-	ASSERT(VMUNetIsValidStrIPv4(config->network.staticIp.dns2));
+	ASSERT(PFU_isValidStrIPv4(config->network.staticIp.dns2));
 	cJSON_AddStringToObject (item, NETWORK_STATICIP_DNS1, config->network.staticIp.dns2);
 
 	cJSON_AddItemToObject (root, NETWORK_STATICIP, item);
