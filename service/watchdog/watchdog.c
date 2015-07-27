@@ -346,8 +346,8 @@ static void dumpSubServie (struct ListService *service)
 }
 static void dumpService (int index, struct ListService *service)
 {
-	const char *strWDMode[PFWD_MODE_END + 1] = { "NONE", "RESTART", "REBOOT", "UNKNOWN" };
-	uint32_t eMode = (service->info.eMode >= PFWD_MODE_END) ? PFWD_MODE_END : service->info.eMode;
+	const char *strWDMode[EPFWD_MODE_END + 1] = { "NONE", "RESTART", "REBOOT", "UNKNOWN" };
+	uint32_t eMode = (service->info.eMode >= EPFWD_MODE_END) ? EPFWD_MODE_END : service->info.eMode;
 
 	printf ("%2d - %4d:%s p[%s] m[%s] t[%d] - a%d %3d %" PRIu64 "\n", 
 			index, service->info.pid, service->info.name, service->info.params,
@@ -512,7 +512,7 @@ static void watchdogAction (watchdog_info_t *pWDI, struct ListService *service)
 
 	switch (service->info.eMode)
 	{
-		case	PFWD_MODE_NONE:
+		case	EPFWD_MODE_NONE:
 			/* nothing */
 			if (fgDebugMode) {
 				ERR("\n");
@@ -522,7 +522,7 @@ static void watchdogAction (watchdog_info_t *pWDI, struct ListService *service)
 				system ("/system/script/vmrun stop &");
 			}
 			break;
-		case	PFWD_MODE_RESTART:
+		case	EPFWD_MODE_RESTART:
 			if (fgDebugMode) {
 				ERR("\n");
 				ERR("\n");
@@ -542,7 +542,7 @@ static void watchdogAction (watchdog_info_t *pWDI, struct ListService *service)
 				system (cmd);
 			}
 			break;
-		case	PFWD_MODE_REBOOT:
+		case	EPFWD_MODE_REBOOT:
 			if (fgDebugMode) {
 				ERR("\n");
 				ERR("\n");

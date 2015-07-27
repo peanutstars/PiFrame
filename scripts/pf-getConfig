@@ -1,0 +1,46 @@
+#!/bin/bash
+
+[ -z "$BASE_DIR" ] && BASE_DIR=/data/config
+
+if [ x"${1:0:1}" == x"/" ] ; then
+	CFILE=$1
+else
+	CFILE=$BASE_DIR/$1
+fi
+
+LastTime0="0"
+LastTime1="0"
+
+
+if [ -e "$CFILE.0" ] ; then
+	_LT=`cat $CFILE.0 | grep "LastTime:" | awk -F ":" '{ print $2 }'`
+	[ -z "$_LT" ] && _LT=0
+	LastTime0=$_LT
+	#echo "L0=$LastTime0"
+fi
+
+if [ -e "$CFILE.1" ] ; then
+	_LT=`cat $CFILE.1 | grep "LastTime:" | awk -F ":" '{ print $2 }'`
+	[ -z "$_LT" ] && _LT=0
+	LastTime1=$_LT
+	#echo "L1=$LastTime1"
+fi
+
+if [ "$LastTime0" -eq "0" -a "$LastTime1" -eq "0" ] ; then
+	echo "$1"
+elif [ "$LastTime0" -ne "0" -a "$LastTime1" -ne "0" ] ; then
+	if [ "$LastTime0" -ge "$LastTime1" ] ; then
+		echo "$1.0"
+	else
+		echo "$1.1"
+	fi
+else
+	if [ "$LastTime0" -eq "0" ] ; then
+		echo "$1.1"
+	elif [ "$LastTime1" -eq "0" ] ; then
+		echo "$1.0"
+	else
+		echo "$1"
+	fi
+fi
+

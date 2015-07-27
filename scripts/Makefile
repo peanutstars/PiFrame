@@ -13,6 +13,7 @@ PF_ENV_FILE	:= pf-env
 SCRIPT_FILES := \
 				pi-frame.init \
 				pi-frame.deinit \
+				pf-getConfig \
 				pf-run \
 				$(PF_ENV_FILE)
 

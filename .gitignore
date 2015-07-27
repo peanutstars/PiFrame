@@ -18,6 +18,8 @@ util/vmq_test/vmq_test
 util/vmqctl/vmqctl
 util/vmshm_test/vmshm_test
 util/vmshmctl/vmshmctl
+service/config/svc.config
+service/watchdog/svc.watchdog
 target/
 tags
 

@@ -13,6 +13,7 @@ SUBDIRS			:= scripts \
 				   drivers \
 				   external \
 				   lib \
+				   service \
 				   util \
 				   default
 						

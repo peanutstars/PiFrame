@@ -6,9 +6,10 @@
 #define PF_DEF_BOOT_INFO_MODEL			"INFO_MODEL"
 #define PF_DEF_BOOT_INFO_RESCUE			"RESCUE"
 
-#define PF_DEF_USER_CONFIG_DIR			"/data/config"
-#define PF_DEF_DEFAULT_CONFIG_DIR		"/system/default"
-#define PF_DEF_CONFIG_TMP_DIR			"/tmp/config"
+#define PF_DEF_USER_CONFIG_DIR			"/data/config/"
+#define PF_DEF_DEFAULT_CONFIG_DIR		"/system/default/"
+#define PF_DEF_CONFIG_TMP_DIR			"/tmp/config/"
+#define PF_DEF_SCRIPTS_DIR				"/system/scripts/"
 
 #define PF_DEF_UDEV_ID_BUS				"ID_BUS"
 #define PF_DEF_UDEV_ID_MODEL			"ID_MODEL"

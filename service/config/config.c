@@ -342,7 +342,7 @@ static int getValidDBFile (struct Database *db, char *dbPath, int pathSize)
 	FILE *fp;
 	char cmd[256];
 	snprintf (db->path, sizeof(db->path), USER_CONFIG_DIR "/%s.json", db->name);
-	snprintf (cmd, sizeof(cmd), "/system/script/get_config %s", db->path);
+	snprintf (cmd, sizeof(cmd), PF_DEF_SCRIPTS_DIR "pf-getConfig %s", db->path);
 	
 	fp = popen (cmd, "r");
 	if (fp) {
@@ -394,12 +394,9 @@ static int dbInit(const char *basedir)
 
 	for (i=0; i < EPF_CONFIG_COUNT; i++)
 	{
-#if 0
-		if (i >= EPF_CT_RUNTIME_NOTUSED) {
-			/* TODO - MUST be removed */
+		if (i >= EPF_CONFIG_RUNTIME) {
 			continue;
 		}
-#endif
 
 retry_file_error:
 		db = &databases[i];
@@ -480,12 +477,10 @@ static void dbSync(int forceMask)
 
 	for(i = 0; i < EPF_CONFIG_COUNT; i++)
 	{
-#if 0
-		if (i >= EPF_CT_RUNTIME_NOTUSED) {
+		if (i >= EPF_CONFIG_RUNTIME) {
 			/* TODO - MUST be removed */
 			continue;
 		}
-#endif
 
 		db = &databases[i];
 		if(db->dirty > 0 || (forceMask & (1 << i)))
@@ -619,12 +614,9 @@ int configExport(int mask, const char *path)
 
 	sprintf(cmd, "/bin/cp -af ");
 	for(i = rmask = 0; i < EPF_CONFIG_COUNT; i++) {
-#if 0
-		if (i >= EPF_CT_RUNTIME_NOTUSED) {
-			/* TODO - MUST be removed */
+		if (i >= EPF_CONFIG_RUNTIME) {
 			continue;
 		}
-#endif
 		if(mask & (1 << i)) {
 			db = &databases[i];
 			sprintf(tmp, "%s/%s/%s.json ", basedir, USER_CONFIG_DIR, db->name);
@@ -722,12 +714,9 @@ int configImport(int mask, const char *path)
 
 	sprintf(cmd, "/bin/cp -af ");
 	for(i = 0; i < EPF_CONFIG_COUNT; i++) {
-#if 0
-		if (i >= EPF_CT_RUNTIME_NOTUSED) {
-			/* TODO - MUST be removed */
+		if (i >= EPF_CONFIG_RUNTIME) {
 			continue;
 		}
-#endif
 		if(mask & (1 << i)) {
 			db = &databases[i];
 			sprintf(tmp, "%s/%s/%s.json", CONFIG_TMP_DIR, model, db->name);

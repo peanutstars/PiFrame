@@ -46,7 +46,7 @@ void eventWDHandler(void)
 	ASSERT (event);
 
 	type = PFWD_TYPE(event->wdid);
-	if (type >= PFWD_TYPE_REGISTER && type < PFWD_TYPE_END) {
+	if (type >= EPFWD_CMD_REGISTER && type < EPFWD_CMD_END) {
 		watchdogAddEvent (event);
 	} else {
 		ERR("Unknown watchdog wdid:0x%08X, pid=%d\n", event->wdid, event->pid);

@@ -21,6 +21,20 @@ fLoadDriver() {
 	[ -n "$SUDO" ] && $SUDO chmod 0666 /dev/vmq /dev/vmshm
 }
 
+fRunService() {
+	fEcho "[START] $1"
+	$* &
+}
+
+fStartService() {
+	fEcho "Start SERVICE !!\n"
+	fRunService svc.config
+}
+
+fStopService() {
+	fEcho "Stop SERVICE !!\n"
+}
+
 fInit() {
 	fEcho "INIT"
 	. $SCRDIR/pf-env
@@ -32,11 +46,13 @@ fInit() {
 fStart() {
 	fEcho "START BEGIN"
 	fLoadDriver
+	fStartService
 	fEcho "START END"
 }
 
 fStop() {
 	fEcho "STOP BEGIN"
+	fStopService
 	fEcho "STOP END"
 }
 
