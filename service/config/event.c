@@ -4,8 +4,8 @@
 #include "vmq.h"
 #include "pflimit.h"
 #include "pfevent.h"
+#include "pfquery.h"
 #include "pfconfig.h"
-//#include "vmdefine.h"
 
 #include "config.h"
 #include "debug.h"
@@ -79,7 +79,7 @@ int configEventHandler(void)
 	event = (struct PFEvent *)VMQueueGetItem(eventQ, NULL);
 	ASSERT (event);
 
-//	if ( VMQueryReplyProcess (event) )
+	if ( PFQueryReplyProcess (event) == 0 )
 	{
 		EPfModule moduleId  = PFE_MODULE_ID(event->id);
 		switch (moduleId)

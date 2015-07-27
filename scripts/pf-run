@@ -53,6 +53,7 @@ fStart() {
 fStop() {
 	fEcho "STOP BEGIN"
 	fStopService
+	$BINDIR/cli notify SYS_POWER_OFF
 	fEcho "STOP END"
 }
 

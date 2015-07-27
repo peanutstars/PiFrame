@@ -1,3 +1,5 @@
+#
+#------------------------------------------------------------------------------
 
 ifndef  BASEDIR
 BASEDIR			:=$(shell pwd)/../..
@@ -6,26 +8,22 @@ include $(BASEDIR)/Rules.mk
 
 #------------------------------------------------------------------------------
 
-TARGET			:= svc.config
-OBJS			:= config.o \
-				   event.o \
+TARGET			:= cli
+OBJS			:= event.o \
 				   notify.o \
-				   config-util.o \
-				   config-system.o \
-				   config-network.o \
-				   main.o
+				   main.o \
+				   notify-system.o
 
 INSTALLDIR		:=$(TARGETDIR)/system/bin
 
-EXTRA_CFLAGS	+=-DSERVICE_NAME=\"$(TARGET)\"
+EXTRA_CFLAGS	+=-I$(VM_ROOT_DIR)/SDK/XCMSDK/include
 
-EXTRA_LFLAGS	+=-lvmshm
+EXTRA_LFLAGS    +=-lvmshm
 EXTRA_LFLAGS	+=-lvmq
 EXTRA_LFLAGS	+=-lpfquery
-EXTRA_LFLAGS	+=-lcjson
+EXTRA_LFLAGS	+=-lpfconfig
 EXTRA_LFLAGS	+=-lpfutil
-EXTRA_LFLAGS	+=-lpfwdt
-EXTRA_LFLAGS	+=-lm
+EXTRA_LFLAGS	+=-lpthread
 EXTRA_LFLAGS	+=-lrt
 
 #------------------------------------------------------------------------------

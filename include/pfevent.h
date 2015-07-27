@@ -116,7 +116,7 @@ struct PFESystem {
 
 enum ESYS_SHUTDOWN_TYPE {
 	ESYS_SHUTDOWN_REBOOT       = 0x74800814,
-	ESYS_SHUTDOWN_POWEROFF,
+	ESYS_SHUTDOWN_EXIT,
 } ;
 
 struct PFESystemShutdown {
