@@ -1,4 +1,5 @@
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -16,6 +17,12 @@
 
 #include "vmq.h"
 #include "pfdebug.h"
+
+#if ( __WORDSIZE == 64 )
+#define Pointer2Integer		uint64_t
+#else
+#define Pointer2Integer		uint32_t
+#endif
 
 /*****************************************************************************/
 
@@ -240,51 +247,6 @@ done:
 	return ptr;
 }
 
-void *VMQueueGetBufferWithKey(struct VMQueue *q, int size)
-{
-	int ret;
-	struct VMQBufferInfo bi;
-	void *ptr = (void *)0;
-
-	ASSERT(q);
-	ASSERT(size > 0);
-#if ENABLE_NOTIFY_LOCK
-	pthread_mutex_lock (&q->lock);
-#endif
-
-	bi.size = size;
-	ret = ioctl(q->fd, VMQ_GETBUF, &bi);
-	if(ret < 0) {
-		if(errno == EINTR)
-			goto done;
-		perror("VMQ_GETBUF");
-		goto done;
-	}
-
-	ptr = &q->base[bi.offset];
-
-	/* Request 이후 Reply가 필요한 경우 unique Key 를 사용하는 경우에 쓴다. */
-	if (size >= 12) {
-		unsigned int *array = (unsigned int *)ptr;
-		ret = ioctl(q->fd, VMQ_GETKEY, &array[2]);
-		if (ret < 0) {
-			if (errno == EINTR)
-				goto done;
-			perror ("VMQ_GETKEY");
-			goto done;
-		}
-	}
-
-done:
-#if ENABLE_NOTIFY_LOCK
-	if (ptr == NULL) {
-		pthread_mutex_unlock (&q->lock);
-	}
-#endif
-	return ptr;
-}
-
-
 void VMQueuePutBuffer(struct VMQueue *q, void *ptr)
 {
 	int ret;
@@ -293,7 +255,7 @@ void VMQueuePutBuffer(struct VMQueue *q, void *ptr)
 	ASSERT(q);
 	ASSERT(ptr);
 
-	bi.offset = (unsigned int)ptr - (unsigned int)q->base;
+	bi.offset = (Pointer2Integer)ptr - (Pointer2Integer)q->base;
 	ret = ioctl(q->fd, VMQ_PUTBUF, &bi);
 	if(ret < 0) {
 		ERR2("VMQ_PUTBUF\n");
@@ -333,7 +295,7 @@ void VMQueuePutItem(struct VMQueue *q, void *ptr)
 	ASSERT(q);
 	ASSERT(ptr);
 
-	ii.offset = (unsigned int)ptr - (unsigned int)q->base;
+	ii.offset = (Pointer2Integer)ptr - (Pointer2Integer)q->base;
 	ret = ioctl(q->fd, VMQ_PUTITEM, &ii);
 	if(ret < 0) {
 		DBG("VMQ_PUTITEM failed\n");
@@ -347,3 +309,23 @@ int VMQueueGetFd(struct VMQueue *q)
 	ASSERT(q);
 	return q->fd;
 }
+
+uint32_t VMQueueGetKey (struct VMQueue *q, uint32_t *pKey)
+{
+	uint32_t key = 0 ;
+	int ret ;
+	ASSERT(q);
+	ret = ioctl(q->fd, VMQ_GETKEY, &key) ;
+	if (ret < 0) {
+		if (errno == EINTR)
+			goto done;
+		perror ("VMQ_GETKEY");
+		goto done;
+	}
+	if (*pKey) {
+		*pKey = key ;
+	}
+done:
+	return key ;
+}
+

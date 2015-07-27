@@ -2,7 +2,7 @@
 #
 #------------------------------------------------------------------------------
 
-SUBDIRS	:= vmq vmshm pfconfig pfwdt util
+SUBDIRS	:= vmq vmshm pfconfig pfwdt pfquery util
 
 #------------------------------------------------------------------------------
 # DEFINE SUBDIR MACRO

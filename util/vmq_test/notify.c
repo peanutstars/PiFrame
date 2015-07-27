@@ -36,7 +36,7 @@ void notifyNoData (int type)
 {
 	struct PFETest *event;
 
-	event = VMQueueGetBufferWithKey (eventQ, sizeof(*event));
+	event = VMQueueGetBuffer(eventQ, sizeof(*event));
 	ASSERT(event);
 
 	PFE_INIT_EVENT(event, type);
@@ -63,7 +63,7 @@ void notifyShort (unsigned short data)
 {
 	struct PFETestShort *event;
 
-	event = VMQueueGetBufferWithKey (eventQ, sizeof(*event));
+	event = VMQueueGetBuffer(eventQ, sizeof(*event));
 	ASSERT(event);
 
 	PFE_INIT_EVENT(event, (PFE_TEST_SHORT));
@@ -91,7 +91,7 @@ void notifyLong (unsigned long data)
 {
 	struct PFETestLong *event;
 
-	event = VMQueueGetBufferWithKey (eventQ, sizeof(*event));
+	event = VMQueueGetBuffer(eventQ, sizeof(*event));
 	ASSERT(event);
 
 	PFE_INIT_EVENT(event, (PFE_TEST_LONG));
