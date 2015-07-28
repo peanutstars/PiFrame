@@ -12,16 +12,17 @@ TARGET			:= cli
 OBJS			:= event.o \
 				   notify.o \
 				   main.o \
-				   notify-system.o
+				   notify-system.o \
+				   query-config.o
 
 INSTALLDIR		:=$(TARGETDIR)/system/bin
 
 EXTRA_CFLAGS	+=-I$(VM_ROOT_DIR)/SDK/XCMSDK/include
 
+EXTRA_LFLAGS	+=-lpfconfig
 EXTRA_LFLAGS    +=-lvmshm
 EXTRA_LFLAGS	+=-lvmq
 EXTRA_LFLAGS	+=-lpfquery
-EXTRA_LFLAGS	+=-lpfconfig
 EXTRA_LFLAGS	+=-lpfutil
 EXTRA_LFLAGS	+=-lpthread
 EXTRA_LFLAGS	+=-lrt

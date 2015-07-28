@@ -33,16 +33,17 @@ static int g_thrun = 0;
 
 /*****************************************************************************/
 
-extern struct VMMethod notifySystem[];
+extern struct PFMethod notifySystem[];
+extern struct PFMethod queryConfig[];
 
-struct VMMethodPool {
+struct PFMethodPool {
 	const char *name;
-	struct VMMethod *method;
+	struct PFMethod *method;
 };
 
-struct VMMethodPool methodPool[] = {
+struct PFMethodPool methodPool[] = {
 	{	"notify",		notifySystem	},
-//	{	"config",		queryConfig		},
+	{	"config",		queryConfig		},
 	{	NULL,							}
 };
 
@@ -103,7 +104,7 @@ static void *do_request_thread(void *args)
 static void help(int argc, char **argv)
 {
 	static const char *usage = "usage: cli <cmd> <method> [<param>, ...]";
-	struct VMMethod *method;
+	struct PFMethod *method;
 	int x, y;
 
 	fprintf(stderr, "%s\n\n", usage);
@@ -128,10 +129,10 @@ static void help(int argc, char **argv)
 	exit (EXIT_FAILURE);
 }
 
-static void methodHandler(struct VMMethod *methods, int argc, char **argv)
+static void methodHandler(struct PFMethod *methods, int argc, char **argv)
 {
 	pthread_t thid;
-	struct VMMethod *m; 
+	struct PFMethod *m; 
 
 	for(m = methods; m->name; m++) {
 		if(strcmp(m->name, argv[2]) == 0)
@@ -140,7 +141,7 @@ static void methodHandler(struct VMMethod *methods, int argc, char **argv)
 				help (argc, argv);
 			}
 
-			if (m->type == VMMT_REPLY)
+			if (m->type == PFMT_REPLY)
 			{
 				pthread_create(&thid, NULL, do_request_thread, NULL);
 				pthread_detach(thid);

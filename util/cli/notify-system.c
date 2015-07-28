@@ -67,12 +67,12 @@ static void SystemShutdown (int argc, char **argv)
 	}
 }
 
-struct VMMethod notifySystem[] = {
-	{	"TEST_INT",			1,	"<num> : just test for demo",	TestDummy,			VMMT_NONE	},
-	{	"SYS_DUMMY",		0,	"n/a : make event of dummy",	SystemDummy,		VMMT_NONE	},
-	{	"SYS_POWER_OFF",	0,	"n/a : Power off",				SystemPowerOff,		VMMT_NONE	},
+struct PFMethod notifySystem[] = {
+	{	"TEST_INT",			1,	"<num> : just test for demo",	TestDummy,			PFMT_NONE	},
+	{	"SYS_DUMMY",		0,	"n/a : make event of dummy",	SystemDummy,		PFMT_NONE	},
+	{	"SYS_POWER_OFF",	0,	"n/a : Power off",				SystemPowerOff,		PFMT_NONE	},
 	{	"SYS_SHUTDOWN",		1,	"<reboot|exit> [<waitSecound>] : broadcast reboot or exit after waitSecound",
-																SystemShutdown,		VMMT_NONE	},
+																SystemShutdown,		PFMT_NONE	},
 	{	NULL, }
 };
 

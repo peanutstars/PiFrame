@@ -5,12 +5,13 @@
 extern "C" {
 #endif	/*__cplusplus*/
 
-struct VMQuery ;
+struct VMQueue ;
 struct PFEvent ;
 
 int  PFQueryWaitReplyWithPutBuffer (struct VMQueue *eventQ, struct PFEvent *request, int timeout, void **reply);
 int  PFQueryReplyProcess (struct PFEvent *event);
 void PFQueryWakeUpAll (void);
+const char *PFQueryGetStrEResult(int erv) ;
 
 #ifdef	__cplusplus
 };

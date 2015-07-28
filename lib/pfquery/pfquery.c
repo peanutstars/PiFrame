@@ -189,3 +189,28 @@ void PFQueryWakeUpAll (void)
 }
 
 /*****************************************************************************/
+#define STR_ERESULT(x)		#x
+static const char *strEResultLists[ERV_RESULT_COUNT+1] = {
+	STR_ERESULT(ERV_OK),
+	STR_ERESULT(ERV_FAIL),
+	STR_ERESULT(ERV_FAIL_BUSY),
+	STR_ERESULT(ERV_FAIL_NODEV),
+	STR_ERESULT(ERV_FAIL_PARAM),
+	STR_ERESULT(ERV_FAIL_TIMEOUT),
+	STR_ERESULT(ERV_OUT_OF_RANGE)
+} ;
+
+const char *PFQueryGetStrEResult(int erv)
+{
+	const char *strEResult ;
+	int rv = abs(erv) ;
+
+	if (rv >= ERV_RESULT_COUNT) {
+		strEResult = strEResultLists[ERV_RESULT_COUNT] ;
+	} else {
+		strEResult = strEResultLists[rv] ;
+	}
+
+	return strEResult ;
+}
+

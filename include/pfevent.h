@@ -26,7 +26,7 @@
 typedef enum
 {
 	ERV_OK					= 0,
-	ERV_FAIL_UNKNOWN,
+	ERV_FAIL,
 	ERV_FAIL_BUSY,
 	ERV_FAIL_NODEV,
 	ERV_FAIL_PARAM,
@@ -62,11 +62,9 @@ typedef enum
 
 #define	MKEID(mod, id, type)			__MKEID((mod), (id), sizeof(type), 0)
 #define	MKEIDF(mod, id, type, flag)		__MKEID((mod), (id), sizeof(type), flag) 
-//#define	MKEID_R(mod, id, type)			__MKEID((mod), (id), sizeof(type), PFE_FLAG_REPORT)
-//#define	MKEID_N(mod, id)				__MKEID((mod), (id), 0, 0)
-//#define	MKEID_NR(mod, id)				__MKEID((mod), (id), 0, PFE_FLAG_REPORT)
 
 #define	__PFE_STRUCT__					uint32_t id; int sec; uint32_t key
+#define	__PFE_STRUCT_QRV__				uint32_t id; int sec; uint32_t key; int32_t result
 
 
 /*****************************************************************************/
@@ -140,8 +138,7 @@ struct PFEConfigUpdate {
 #define PFE_CONFIG_UPDATE			MKEID(EPF_MOD_CONFIG, 0, struct PFEConfigUpdate)
 
 struct PFEConfigReplyNormal {
-	__PFE_STRUCT__;
-	int32_t	result;
+	__PFE_STRUCT_QRV__;
 };
 struct PFEConfigRequestExport {
 	__PFE_STRUCT__;

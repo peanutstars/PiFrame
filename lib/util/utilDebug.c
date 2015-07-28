@@ -13,36 +13,6 @@
 
 #include "pfevent.h"
 
-struct ResultMessage
-{
-	EResult		rv;
-	char *		msg;
-};
-
-
-static const volatile struct ResultMessage resultTables[ERV_RESULT_COUNT] = {
-	{	ERV_OK,					"OK"				},
-	{	ERV_FAIL_UNKNOWN,		"Fail(unknown)"		},
-	{	ERV_FAIL_BUSY,			"Fail(busy)"		},
-	{	ERV_FAIL_NODEV,			"Fail(no device)"	},
-	{	ERV_FAIL_PARAM,			"Fail(param)"		},
-	{	ERV_FAIL_TIMEOUT,		"Fail(timeout)"		}
-};
-
-static const char *strUnknown = "Fail(unknown)";
-
-const char *PFU_getStringERusult (EResult rv)
-{
-	int i;
-
-	for (i=0; resultTables[i].msg; i++) {
-		if ( rv == resultTables[i].rv ) {
-			return resultTables[i].msg;
-		}
-	}
-	return strUnknown;
-}
-
 void PFU_hexDump (const char *desc, const void *addr, const int len)
 {
 	int i;

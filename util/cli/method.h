@@ -2,14 +2,14 @@
 #ifndef	__METHOD_H__
 #define	__METHOD_H__
 
-enum VMMethodType
+enum PFMethodType
 {
-	VMMT_NONE	= 0,
-	VMMT_REPLY,
-	VMMT_END
+	PFMT_NONE	= 0,
+	PFMT_REPLY,
+	PFMT_END
 };
 
-struct VMMethod {
+struct PFMethod {
 	const char *name;
 	int			minArgc;
 	const char *help;

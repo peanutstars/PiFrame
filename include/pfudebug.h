@@ -5,7 +5,6 @@
 extern "C" {
 #endif  /*__cplusplus*/
 
-const char *PFU_getStringERusult (EResult rv) ;
 void PFU_hexDump (const char *desc, const void *addr, const int len) ;
 
 #ifdef  __cplusplus

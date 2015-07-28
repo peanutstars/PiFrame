@@ -79,25 +79,3 @@ void *doRequestStruct (uint32_t eid, void *edata, int edsize, int timeoutSec)
 
 	return reply;
 }
-
-/******************************************************************************
-  query.config
- *****************************************************************************/
-//void *doConfigRequestExport (int mask, const char *path)
-//{
-//	struct VMEConfigRequestExport *request;
-//	void *reply = NULL;
-//
-//	request = VMQueueGetBufferWithKey (eventQ, sizeof(*request));
-//	ASSERT(request);
-//
-//	PFE_INIT_EVENT(request, (VME_CONFIG_REQUEST_EXPORT));
-//	request->mask = mask;
-//	snprintf (request->path, sizeof(request->path), "%s", path);
-//
-//	VMQueryWaitReplyWithPutBuffer (eventQ, (struct PFEvent *)request, 5, &reply);
-////	DBG("reply = %p\n", reply);
-//
-//	return reply;
-//}
-
