@@ -835,16 +835,16 @@ done:
 	return ret;
 }
 
-static unsigned int key_count = 0x63302330;
+static unsigned int unique_key = 0x08012015 ;
 static unsigned int vmq_getkey (struct file *filp, unsigned long arg)
 {
 	unsigned int key;
 	int ret = -EINVAL;
 
 	mutex_lock(&vmq_buffer_mutex);
-	key = key_count ++;
-	if (key_count == 0)	/* Not allow to zero */
-		key_count ++;
+	key = unique_key ++;
+	if (unique_key == 0)	/* Not allow to zero */
+		unique_key ++;
 	mutex_unlock (&vmq_buffer_mutex);
 
 	ret = copy_to_user((void __user *)arg, &key, sizeof(key));

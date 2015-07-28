@@ -322,7 +322,8 @@ uint32_t VMQueueGetKey (struct VMQueue *q, uint32_t *pKey)
 		perror ("VMQ_GETKEY");
 		goto done;
 	}
-	if (*pKey) {
+//	DBG("KEY = %08X\n", key) ;
+	if (pKey) {
 		*pKey = key ;
 	}
 done:
