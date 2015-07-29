@@ -12,7 +12,7 @@
 
 /*****************************************************************************/
 
-#define TIMER_TICK_MSEC			50
+#define TIMER_TICK_MSEC		(50)
 static pthread_mutex_t		mutex ;
 static pthread_cond_t		signal ;
 static pthread_t			thid ;
@@ -239,6 +239,11 @@ int del_timer(struct timer_list *timer)
 	return rv ;
 }
 
+unsigned long inline timerCalExpire (uint32_t msec)
+{
+	return (jiffies + ((msec/TIMER_TICK_MSEC) ?: 1)) ;
+}
+
 /*****************************************************************************/
 
 /*****************************************************************************/
@@ -260,13 +265,8 @@ static void *timerThread (void *param)
 	return NULL ;
 }
 
+#if 0
 static struct timer_list myTimer ;
-unsigned long timerCalExpire (uint32_t msec)
-{
-	unsigned long addTick = msec / TIMER_TICK_MSEC ;
-	return (jiffies + (addTick ?: 1)) ;
-}
-
 void testTimer(unsigned long param)
 {
 	struct timeval tv ;
@@ -278,6 +278,7 @@ void testTimer(unsigned long param)
 		add_timer (&myTimer) ;
 	}
 }
+#endif
 
 void timerInit(void)
 {
@@ -286,6 +287,7 @@ void timerInit(void)
 	init_timervecs() ;
 	CREATE_THREAD(thid, timerThread, 0x800, NULL, 1) ;
 
+#if 0
 	memset(&myTimer, 0, sizeof(myTimer)) ;
 	myTimer.expires = timerCalExpire (20) ;
 	myTimer.data = 1 ;
@@ -293,6 +295,7 @@ void timerInit(void)
 
 	testTimer(0) ;
 	add_timer (&myTimer) ;
+#endif
 }
 
 void timerExit(void)

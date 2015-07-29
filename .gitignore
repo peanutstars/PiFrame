@@ -12,6 +12,7 @@ external/include/
 external/packages/.build_count
 external/packages/.build_model
 scripts/pf-env
+service/action/svc.action
 service/config/svc.config
 service/watchdog/svc.watchdog
 target/
