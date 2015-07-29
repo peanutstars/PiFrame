@@ -24,8 +24,6 @@
 #define	SERVICE_NAME			"svc.watchdog"
 #endif
 
-#define	POLL_TIMEOUT			(1000)
-
 /*****************************************************************************/
 
 static int g_run = 1;
@@ -69,7 +67,7 @@ static void run(void)
 		if( ! g_run)
 			break;
 
-		ret = poll(pollfd, 2, POLL_TIMEOUT);
+		ret = poll(pollfd, 2, PF_DEF_POLL_TIMEOUT_MSEC);
 		if(ret <= 0) {
 			if(ret < 0) {
 				if(errno != EINTR) {

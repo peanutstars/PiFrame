@@ -12,6 +12,7 @@
 #include <pthread.h>
 
 #include "vmq.h"
+#include "pfdefine.h"
 #include "pfconfig.h"
 #include "pfevent.h"
 #include "pfquery.h"
@@ -22,10 +23,6 @@
 #include "method.h"
 #include "monitoring.h"
 #include "pfdebug.h"
-
-/*****************************************************************************/
-
-#define	POLL_TIMEOUT			(1000)
 
 /*****************************************************************************/
 
@@ -82,7 +79,7 @@ static void *do_request_thread(void *args)
 			break;
 
 		g_thrun = 1;
-		ret = poll(pollfd, 1, POLL_TIMEOUT);
+		ret = poll(pollfd, 1, PF_DEF_POLL_TIMEOUT_MSEC);
 		if(ret <= 0) {
 			if(ret < 0) {
 				if(errno != EINTR) {

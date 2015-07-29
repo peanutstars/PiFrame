@@ -27,6 +27,8 @@
 #define PF_DEF_WATCHDOG_PERIOD			5				// Second
 #define PF_DEF_MARK_WATCHDOG_DISABLE	"/tmp/disable_watchdog"
 
+#define PF_DEF_POLL_TIMEOUT_MSEC		(1000)				
+
 enum EPF_FILESYSTEM_TYPE {
 	EPF_FS_UNKNOWN = -1,
 	EPF_FS_FAT = 0,

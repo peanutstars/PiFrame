@@ -10,6 +10,7 @@
 #include <assert.h>
 
 #include "vmq.h"
+#include "pfdefine.h"
 #include "pfconfig.h"
 #include "pfevent.h"
 #include "pfwdt.h"
@@ -25,8 +26,6 @@
 #ifndef SERVICE_NAME
 #define	SERVICE_NAME			"svc.config"
 #endif
-
-#define	POLL_TIMEOUT			(1000)
 
 /*****************************************************************************/
 
@@ -47,7 +46,7 @@ static void run(void)
 		if(!config_run)
 			break;
 
-		ret = poll(pollfd, 1, POLL_TIMEOUT);
+		ret = poll(pollfd, 1, PF_DEF_POLL_TIMEOUT_MSEC);
 		if(ret <= 0) {
 			if(ret < 0) {
 				if(errno != EINTR) {

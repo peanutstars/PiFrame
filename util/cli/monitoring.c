@@ -54,7 +54,7 @@ static void printSystemEvent(struct EventInfo *ei)
 		break ;
 	CASE(PFE_SYS_SHUTDOWN) ;
 		break ;
-	deafult :
+	default : 
 		strcat (ei->strEvent, "SYSTEM") ;
 	}
 	printf ("%s %s %s\n", ei->strHeader, ei->strEvent, ei->strBody) ;
@@ -64,9 +64,8 @@ static void printServiceEvent(struct EventInfo *ei)
 	struct PFEvent *event = ei->event ;
 	switch (event->id)
 	{
-	deafult :
+	default :
 		strcat (ei->strEvent, "SERVICE") ;
-		break ;
 	}
 	printf ("%s %s %s\n", ei->strHeader, ei->strEvent, ei->strBody) ;
 }
@@ -78,8 +77,9 @@ static void printConfigEvent(struct EventInfo *ei)
 	CASE(PFE_CONFIG_UPDATE) ;
 		break ;
 	CASE(PFE_CONFIG_REPLY_NORMAL) ;
-		break;
+		break ;
 	CASE(PFE_CONFIG_REQUEST_EXPORT) ;
+		break ;
 	default :
 		strcat (ei->strEvent, "CONFIG") ;
 	}
@@ -92,7 +92,6 @@ static void printActionEvent(struct EventInfo *ei)
 	{
 	default :
 		strcat (ei->strEvent, "ACTION") ;
-		break ;
 	}
 	printf ("%s %s %s\n", ei->strHeader, ei->strEvent, ei->strBody) ;
 }
