@@ -16,19 +16,19 @@
 #include "pfwdt.h"
 #include "pfdebug.h"
 
-#include "config.h"
 #include "event.h"
 #include "notify.h"
+#include "config.h"
 
 /*****************************************************************************/
 
 #ifndef SERVICE_NAME
-#define	SERVICE_NAME			"svc.config"
+#define	SERVICE_NAME			"svc.base"	// XXX : Please change service name.
 #endif
 
 /*****************************************************************************/
 
-static int config_run = 1;
+static int fgRun = 1;
 
 /*****************************************************************************/
 
@@ -37,29 +37,24 @@ static void run(void)
 	int ret;
 	struct pollfd pollfd[1];
 
-	pollfd[0].fd = configEventGetFd();
+	pollfd[0].fd = eventGetFd();
 	pollfd[0].events = POLLIN;
 
-	for( ; ; )
+	for( ; fgRun ; )
 	{
-		if(!config_run)
-			break;
-
 		ret = poll(pollfd, 1, PF_DEF_POLL_TIMEOUT_MSEC);
 		if(ret <= 0) {
 			if(ret < 0) {
 				if(errno != EINTR) {
-					perror(SERVICE_NAME "::poll");
+					ERR2("poll\n") ;
 					exit(EXIT_FAILURE);
 				}
 			}
 		}
 
 		if(pollfd[0].revents & POLLIN) {
-			config_run = configEventHandler();
+			fgRun = eventHandler();
 		}
-
-		configUpdate(0);
 	}
 }
 
@@ -67,20 +62,20 @@ static void run(void)
 
 int main(int argc, char **argv)
 {
-	PFWatchdogRegister (argc, argv, EPFWD_MODE_REBOOT, 30);
+	/* XXX : Please change a watchdog mode, EPFWD_MODE_XXXXX */
+	PFWatchdogRegister (argc, argv, EPFWD_MODE_NONE, 30) ;
 
-	notifyInit();
-	configEventInit();
-	configInit(PFCONFIG_NAME);
+	notifyInit() ;
+	eventInit() ;
+	configInit() ;
 
-	run();
+	run() ;
 
-	configEventExit();
-	notifyExit();
-	
-	configUpdate(1);
+	configExit() ;
+	eventExit() ;
+	notifyExit() ;
 
-	PFWatchdogUnregister ();
+	PFWatchdogUnregister () ;
 
 	return 0;
 }

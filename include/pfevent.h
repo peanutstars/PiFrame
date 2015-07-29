@@ -2,7 +2,10 @@
 #define	__PF_EVENT_H__
 
 #include <stdint.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <time.h>
+
 #include "pfconfig.h"
 #include "pfsvc.h"
 #include "pftype.h"
