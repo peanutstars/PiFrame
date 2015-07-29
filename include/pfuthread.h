@@ -73,6 +73,9 @@
 #define WAIT_SIGNAL_TIMEOUT(signal, mutex, timeout) \
                                     pthread_cond_timedwait(&(signal), &(mutex), &(timeout))
 #define SIGNAL(signal)              pthread_cond_signal(&(signal))
+#define SIGNAL_MUTEX(signal, mutex)	LOCK_MUTEX(mutex) ;											\
+									SIGNAL(signal) ;											\
+									UNLOCK_MUTEX(mutex) ;
 #define BROADCAST(signal)           pthread_cond_broadcast(&(signal))
 
 
