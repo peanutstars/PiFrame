@@ -12,6 +12,7 @@ TARGET			:= cli
 OBJS			:= event.o \
 				   notify.o \
 				   main.o \
+				   monitoring.o \
 				   notify-system.o \
 				   query-config.o
 

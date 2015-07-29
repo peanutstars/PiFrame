@@ -20,6 +20,7 @@
 #include "event.h"
 #include "notify.h"
 #include "method.h"
+#include "monitoring.h"
 #include "pfdebug.h"
 
 /*****************************************************************************/
@@ -33,19 +34,21 @@ static int g_thrun = 0;
 
 /*****************************************************************************/
 
-extern struct PFMethod notifySystem[];
-extern struct PFMethod queryConfig[];
+extern struct PFMethod monitoring[] ;
+extern struct PFMethod notifySystem[] ;
+extern struct PFMethod queryConfig[] ;
 
 struct PFMethodPool {
-	const char *name;
-	struct PFMethod *method;
-};
+	const char *name ;
+	struct PFMethod *method ;
+} ;
 
 struct PFMethodPool methodPool[] = {
-	{	"notify",		notifySystem	},
-	{	"config",		queryConfig		},
+	{	"monitoring",	monitoring		} ,
+	{	"notify",		notifySystem	} ,
+	{	"config",		queryConfig		} ,
 	{	NULL,							}
-};
+} ;
 
 /*****************************************************************************/
 /* signal handling                                                           */
@@ -193,11 +196,9 @@ int main(int argc, char **argv)
 		fprintf(stderr, "The category of command is not found - %s\n\n", argv[1]);
 	}
 
-#if 0
-	if (fg_eventMonitorRun) {
+	if ( isMonitoring() ) {
 		do_request_thread (NULL);
 	}
-#endif
 
 	eventExit();
 	notifyExit();

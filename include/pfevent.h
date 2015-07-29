@@ -49,10 +49,11 @@ typedef enum
 #define	PFE_PAYLOAD_SIZE(id)		(((id) >> 4) & 0xfff)
 #define	PFE_IS_REPORT(id)			(id & PFE_FLAG_REPORT)
 #define PFE_IS_REPLY(id)			(id & PFE_FLAG_REPLY)
-#define	PFE_INIT_EVENT(event, eid)	\
-	do { 							\
-		(event)->id = (eid);		\
-		(event)->sec = time(NULL);	\
+#define	PFE_INIT_EVENT(event, eid)				\
+	do {										\
+		(event)->id = (eid);					\
+		(event)->sec = time(NULL);				\
+		(event)->srcPid = (int32_t) getpid();	\
 	} while(0)
 #define PFE_QUERY_ID_START			(100)
 
@@ -63,8 +64,8 @@ typedef enum
 #define	MKEID(mod, id, type)			__MKEID((mod), (id), sizeof(type), 0)
 #define	MKEIDF(mod, id, type, flag)		__MKEID((mod), (id), sizeof(type), flag) 
 
-#define	__PFE_STRUCT__					uint32_t id; int sec; uint32_t key
-#define	__PFE_STRUCT_QRV__				uint32_t id; int sec; uint32_t key; int32_t result
+#define	__PFE_STRUCT__					uint32_t id; int sec; int32_t srcPid ; uint32_t key
+#define	__PFE_STRUCT_QRV__				uint32_t id; int sec; int32_t srcPid ; uint32_t key; int32_t result
 
 
 /*****************************************************************************/

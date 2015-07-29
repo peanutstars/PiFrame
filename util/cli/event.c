@@ -11,6 +11,7 @@
 #include "pfconfig.h"
 #include "pfdebug.h"
 
+#include "monitoring.h"
 
 /*****************************************************************************/
 
@@ -42,20 +43,19 @@ int eventGetFd(void)
 
 int eventHandler(void)
 {
-	struct PFEvent *event;
-	int run = 1;
+	struct PFEvent *event ;
+	int run = 1 ;
 
-	event = (struct PFEvent *)VMQueueGetItem(eventQ, NULL);
+	event = (struct PFEvent *)VMQueueGetItem(eventQ, NULL) ;
 	ASSERT (event);
 
-#if 0
-	if ( fg_eventMonitorRun ) {
-		processEventMonitor (event);
-	} else 
-#endif
-	{
-		if ( PFQueryReplyProcess (event) == 0 )
-		{
+	if ( isMonitoring() ) {
+		doMonitoringEvents(event) ;
+		if (event->id == PFE_SYS_POWER_OFF) {
+			run = 0 ;
+		}
+	} else {
+		if ( PFQueryReplyProcess(event) == 0 ) {
 			switch(event->id)
 			{
 				default:
