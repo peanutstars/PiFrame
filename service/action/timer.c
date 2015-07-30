@@ -8,19 +8,19 @@
 
 #include "notify.h"
 
-static TimerKey timerKeyOclock = 0 ;
-static TimerKey timerKeyMinute = 0 ;
+struct TimerInfo {
+	TimerKey	key ;
+	int			hour ;
+} ;
+static struct TimerInfo timerInfoEveryMinute ;
 
-static ETFReturn timerFuncOclock (void *param)
+static void notifyOclock(struct timeval *tv)
 {
-	struct timeval tv ;
 	struct tm tm ;
-	time_t msec ;
-	char strTime[32] ;
 	struct PFESystemTime notify ;
 
-	gettimeofday (&tv, NULL) ;
-	localtime_r(&tv.tv_sec, &tm) ;
+	gettimeofday (tv, NULL) ;
+	localtime_r(&tv->tv_sec, &tm) ;
 	notify.year = tm.tm_year + 1900 ;
 	notify.month = tm.tm_mon + 1 ;
 	notify.day = tm.tm_mday ;
@@ -28,22 +28,11 @@ static ETFReturn timerFuncOclock (void *param)
 	notify.min = tm.tm_min ;
 	notify.sec = tm.tm_sec ;
 	doNotifyStruct (PFE_SYS_TIME, &notify, sizeof(notify)) ;
-	
-	strftime (strTime, sizeof(strTime), "%X", &tm) ;
-	DBG("Time : %s - %d.%06d\n", strTime, (int)tv.tv_sec, (int)tv.tv_usec) ;
-	
-	/* Calculate a time for Next Notify */
-	gettimeofday (&tv, NULL) ;
-	msec = (tv.tv_sec % 3600) * 1000 + (tv.tv_usec / 1000) ;
-	msec = 3600000 - msec ;
-	DBG("hour msec = %d\n", (int)msec) ;
-	PFU_timerSetMsec(timerKeyOclock, msec) ;
-
-	return ETFUNC_RV_REPEAT ;
 }
 
 static ETFReturn timerFuncMinute (void *param)
 {
+	struct TimerInfo *ti = (struct TimerInfo *) param ;
 	struct timeval tv ;
 	struct tm tm ;
 	time_t msec ;
@@ -51,30 +40,40 @@ static ETFReturn timerFuncMinute (void *param)
 
 	gettimeofday (&tv, NULL) ;
 	localtime_r(&tv.tv_sec, &tm) ;
+	if (ti->hour != tm.tm_hour) {
+		ti->hour = tm.tm_hour ;
+		notifyOclock(&tv) ;
+	}
 	strftime (strTime, sizeof(strTime), "%X", &tm) ;
 	DBG("Time : %s - %d.%06d\n", strTime, (int)tv.tv_sec, (int)tv.tv_usec) ;
 	
 	gettimeofday (&tv, NULL) ;
-
-	msec = (tv.tv_sec % 60) * 1000 + (tv.tv_usec / 1000) ;
-	msec = 60000 - msec ;
-	DBG("min msec = %d\n", (int)msec) ;
-	PFU_timerSetMsec(timerKeyMinute, msec) ;
+	msec = 60000 - ((tv.tv_sec % 60) * 1000 + (tv.tv_usec / 1000)) ;
+	PFU_timerSetMsec(ti->key, msec) ;
 
 	return ETFUNC_RV_REPEAT ;
 }
 
 void timerInit(void)
 {
+	struct timeval tv ;
+	struct tm tm ;
+
 	PFU_timerInit() ;
-	timerKeyOclock = PFU_timerAdd (100, timerFuncOclock, NULL, 0) ;
-	timerKeyMinute = PFU_timerAdd (100, timerFuncMinute, NULL, 0) ;
+
+	/* initialize for o'clock notify. */
+	memset(&timerInfoEveryMinute, 0, sizeof(timerInfoEveryMinute)) ;
+	gettimeofday (&tv, NULL) ;
+	localtime_r(&tv.tv_sec, &tm) ;
+	timerInfoEveryMinute.hour = tm.tm_hour ;
+
+	timerInfoEveryMinute.key = PFU_timerAdd (100, timerFuncMinute, &timerInfoEveryMinute, 0) ;
 }
 
 void timerExit(void)
 {
-	if (timerKeyOclock) {
-		PFU_timerDelete (timerKeyOclock) ;
+	if (timerInfoEveryMinute.key) {
+		PFU_timerDelete (timerInfoEveryMinute.key) ;
 	}
 	PFU_timerExit() ;
 }
