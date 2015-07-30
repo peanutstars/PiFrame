@@ -3,12 +3,12 @@
 
 #include <list.h>
 
-struct TimerList {
-	struct list_head list ;
-	unsigned long expires ;
-	void *data ;
-	void (*function)(void *) ;
+enum ETIMER_FUNC_RETURN {
+	ETFUNC_RV_DONE = 0 ,
+	ETFUNC_RV_REPEAT,
+	ETFUNC_RV_END
 } ;
+typedef enum ETIMER_FUNC_RETURN ETFuncReturn ;
 
 void timerInit(void) ;
 void timerExit(void) ;

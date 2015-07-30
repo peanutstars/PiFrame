@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "list.h"
 #include "pfdefine.h"
@@ -10,6 +11,9 @@
 #include "timer.h"
 
 
+
+static void reuse_timer (struct TimerList *timer, ETFuncReturn etrv) ;
+
 /*****************************************************************************/
 
 #define DEBUG_TIMER_TEST	
@@ -18,6 +22,15 @@ static pthread_mutex_t		mutex ;
 static pthread_cond_t		signal ;
 static pthread_t			thid ;
 static int fgRun = 1 ;
+
+struct TimerList {
+	struct list_head list ;
+	unsigned long expires ;
+	int msec ;
+	int (*timerFunc)(void *) ;
+	void *param ;
+	int fgFree ;
+} ;
 
 /*****************************************************************************/
 /*
@@ -168,18 +181,22 @@ repeat:
 		curr = head->next;
 		if (curr != head) {
 			struct TimerList *timer;
-			void (*fn)(void *);
-			void *data;
+			int (*fn)(void *);
+			void *param;
 
 			timer = list_entry(curr, struct TimerList, list);
- 			fn = timer->function;
- 			data= timer->data;
+ 			fn = timer->timerFunc ;
+ 			param= timer->param;
 
 			detach_timer(timer);
 			timer->list.next = timer->list.prev = NULL;
 			timer_enter(timer);
 			UNLOCK_MUTEX(mutex) ;
-			fn(data);
+#if 0
+			fn(param); // Call a user defined function.
+#else
+			reuse_timer(timer, fn(param)) ;
+#endif
 			LOCK_MUTEX(mutex) ;
 			timer_exit();
 			goto repeat;
@@ -206,6 +223,11 @@ static void timer_process(void)
 	run_timer_list() ;
 }
 /*****************************************************************************/
+
+static unsigned long inline calculateExpireTime (uint32_t msec)
+{
+	return (jiffies + ((msec/TIMER_TICK_MSEC) ?: 1)) ;
+}
 
 void add_timer (struct TimerList *timer)
 {
@@ -239,13 +261,22 @@ int del_timer(struct TimerList *timer)
 	UNLOCK_MUTEX(mutex) ;
 	return rv ;
 }
-
-unsigned long inline timerCalExpire (uint32_t msec)
+static void reuse_timer (struct TimerList *timer, ETFuncReturn etrv)
 {
-	return (jiffies + ((msec/TIMER_TICK_MSEC) ?: 1)) ;
+	if (etrv == ETFUNC_RV_REPEAT) {
+		timer->expires = calculateExpireTime(timer->msec) ;
+		add_timer (timer) ;
+	} else {
+		if (timer->fgFree && timer->param) {
+			free (timer->param) ;
+		}
+		free (timer) ;
+	}
 }
 
 /*****************************************************************************/
+
+
 
 /*****************************************************************************/
 
@@ -267,19 +298,32 @@ static void *timerThread (void *param)
 }
 
 #ifdef DEBUG_TIMER_TEST
-#define DEBUG_TIMER_INTERVER_MSEC		2000
-static struct TimerList myTimer ;
-void testTimer(void *param)
+int testTimer(void *param)
 {
+	static int count = 0;
 	struct timeval tv ;
 	gettimeofday (&tv, NULL) ;
-	DBG("%u.%06d\n", (uint32_t)tv.tv_sec, (int32_t)tv.tv_usec) ;
+	DBG("%u.%06d - %d\n", (uint32_t)tv.tv_sec, (int32_t)tv.tv_usec, count) ;
 
-	if (param) {
-		struct TimerList *tl = (struct TimerList *)param ;
-		tl->expires = timerCalExpire (DEBUG_TIMER_INTERVER_MSEC) ;
-		add_timer (tl) ;
+	if (count++ >= 500) {
+		return ETFUNC_RV_DONE ;
 	}
+	return ETFUNC_RV_REPEAT ;
+}
+void testTimerAdder(int msec)
+{
+	struct TimerList *tl ;
+
+	tl = (struct TimerList *) calloc (1, sizeof(*tl)) ; 
+	ASSERT(tl) ;
+	tl->expires = calculateExpireTime (msec) ;
+	tl->msec = msec ;
+	tl->param = NULL ;
+	tl->timerFunc= testTimer ;
+	tl->fgFree = 1 ;
+
+	testTimer(NULL) ;
+	add_timer (tl) ;
 }
 #endif /* DEBUG_TIMER_TEST */
 
@@ -289,16 +333,6 @@ void timerInit(void)
 	INIT_MUTEX(mutex) ;
 	init_timervecs() ;
 	CREATE_THREAD(thid, timerThread, 0x800, NULL, 1) ;
-
-#ifdef DEBUG_TIMER_TEST 
-	memset(&myTimer, 0, sizeof(myTimer)) ;
-	myTimer.expires = timerCalExpire (DEBUG_TIMER_INTERVER_MSEC) ;
-	myTimer.data = (void *)&myTimer ;
-	myTimer.function = testTimer ;
-
-	testTimer(NULL) ;
-	add_timer (&myTimer) ;
-#endif /* DEBUG_TIMER_TEST */
 }
 
 void timerExit(void)
