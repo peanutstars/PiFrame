@@ -12,7 +12,7 @@ struct TimerInfo {
 	TimerKey	key ;
 	int			hour ;
 } ;
-static struct TimerInfo timerInfoEveryMinute ;
+static struct TimerInfo timerEveryMinute ;
 
 static void notifyOclock(struct timeval *tv)
 {
@@ -61,18 +61,18 @@ void timerInit(void)
 	PFU_timerInit() ;
 
 	/* initialize for o'clock notify. */
-	memset(&timerInfoEveryMinute, 0, sizeof(timerInfoEveryMinute)) ;
+	memset(&timerEveryMinute, 0, sizeof(timerEveryMinute)) ;
 	gettimeofday (&tv, NULL) ;
 	localtime_r(&tv.tv_sec, &tm) ;
-	timerInfoEveryMinute.hour = tm.tm_hour ;
+	timerEveryMinute.hour = tm.tm_hour ;
 
-	timerInfoEveryMinute.key = PFU_timerAdd (100, timerFuncMinute, &timerInfoEveryMinute, 0) ;
+	timerEveryMinute.key = PFU_timerAdd (100, timerFuncMinute, &timerEveryMinute, 0) ;
 }
 
 void timerExit(void)
 {
-	if (timerInfoEveryMinute.key) {
-		PFU_timerDelete (timerInfoEveryMinute.key) ;
+	if (timerEveryMinute.key) {
+		PFU_timerDelete (timerEveryMinute.key) ;
 	}
 	PFU_timerExit() ;
 }

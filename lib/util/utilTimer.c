@@ -1,3 +1,10 @@
+/*
+
+   This code is referenced from linux-2.4.37/kernel/timer.c
+
+ */
+
+
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
@@ -9,7 +16,6 @@
 #include "pfdebug.h"
 
 #include "pfutimer.h"
-
 
 /*****************************************************************************/
 
