@@ -12,6 +12,7 @@
 
 /*****************************************************************************/
 
+#define DEBUG_TIMER_TEST	
 #define TIMER_TICK_MSEC		(50)
 static pthread_mutex_t		mutex ;
 static pthread_cond_t		signal ;
@@ -73,7 +74,7 @@ static void init_timervecs (void)
 static unsigned long timer_jiffies = 0 ;
 static unsigned long jiffies = 0 ;
 
-static inline void internal_add_timer(struct timer_list *timer)
+static inline void internal_add_timer(struct TimerList *timer)
 {
 	/*
 	 * must be cli-ed when calling this
@@ -115,11 +116,11 @@ static inline void internal_add_timer(struct timer_list *timer)
 	list_add(&timer->list, vec->prev);
 }
 
-static inline int timer_pending (const struct timer_list * timer)
+static inline int timer_pending (const struct TimerList * timer)
 {
 	return timer->list.next != NULL;
 }
-static inline int detach_timer (struct timer_list *timer)
+static inline int detach_timer (struct TimerList *timer)
 {
 	if (!timer_pending(timer))
 		return 0;
@@ -138,9 +139,9 @@ static inline void cascade_timers(struct timer_vec *tv)
 	 * detach them individually, just clear the list afterwards.
 	 */
 	while (curr != head) {
-		struct timer_list *tmp;
+		struct TimerList *tmp;
 
-		tmp = list_entry(curr, struct timer_list, list);
+		tmp = list_entry(curr, struct TimerList, list);
 		next = curr->next;
 		list_del(curr); // not needed
 		internal_add_timer(tmp);
@@ -166,11 +167,11 @@ repeat:
 		head = tv1.vec + tv1.index;
 		curr = head->next;
 		if (curr != head) {
-			struct timer_list *timer;
-			void (*fn)(unsigned long);
-			unsigned long data;
+			struct TimerList *timer;
+			void (*fn)(void *);
+			void *data;
 
-			timer = list_entry(curr, struct timer_list, list);
+			timer = list_entry(curr, struct TimerList, list);
  			fn = timer->function;
  			data= timer->data;
 
@@ -189,9 +190,9 @@ repeat:
 
 		curr = queued.next;
 		while (curr != &queued) {
-			struct timer_list *timer;
+			struct TimerList *timer;
 
-			timer = list_entry(curr, struct timer_list, list);
+			timer = list_entry(curr, struct TimerList, list);
 			curr = curr->next;
 			internal_add_timer(timer);
 		}			
@@ -206,7 +207,7 @@ static void timer_process(void)
 }
 /*****************************************************************************/
 
-void add_timer (struct timer_list *timer)
+void add_timer (struct TimerList *timer)
 {
 	LOCK_MUTEX(mutex) ;
 	if (timer_pending(timer)) {
@@ -219,7 +220,7 @@ bug :
 	UNLOCK_MUTEX(mutex) ;
 	ASSERT( ! "Timer Bug !!\n") ;
 }
-int mod_timer(struct timer_list *timer, unsigned long expires)
+int mod_timer(struct TimerList *timer, unsigned long expires)
 {
 	int rv ;
 	LOCK_MUTEX(mutex) ;
@@ -229,7 +230,7 @@ int mod_timer(struct timer_list *timer, unsigned long expires)
 	UNLOCK_MUTEX(mutex) ;
 	return rv ;
 }
-int del_timer(struct timer_list *timer)
+int del_timer(struct TimerList *timer)
 {
 	int rv ;
 	LOCK_MUTEX(mutex) ;
@@ -265,20 +266,22 @@ static void *timerThread (void *param)
 	return NULL ;
 }
 
-#if 0
-static struct timer_list myTimer ;
-void testTimer(unsigned long param)
+#ifdef DEBUG_TIMER_TEST
+#define DEBUG_TIMER_INTERVER_MSEC		2000
+static struct TimerList myTimer ;
+void testTimer(void *param)
 {
 	struct timeval tv ;
 	gettimeofday (&tv, NULL) ;
 	DBG("%u.%06d\n", (uint32_t)tv.tv_sec, (int32_t)tv.tv_usec) ;
 
 	if (param) {
-		myTimer.expires = timerCalExpire (20) ;
-		add_timer (&myTimer) ;
+		struct TimerList *tl = (struct TimerList *)param ;
+		tl->expires = timerCalExpire (DEBUG_TIMER_INTERVER_MSEC) ;
+		add_timer (tl) ;
 	}
 }
-#endif
+#endif /* DEBUG_TIMER_TEST */
 
 void timerInit(void)
 {
@@ -287,15 +290,15 @@ void timerInit(void)
 	init_timervecs() ;
 	CREATE_THREAD(thid, timerThread, 0x800, NULL, 1) ;
 
-#if 0
+#ifdef DEBUG_TIMER_TEST 
 	memset(&myTimer, 0, sizeof(myTimer)) ;
-	myTimer.expires = timerCalExpire (20) ;
-	myTimer.data = 1 ;
+	myTimer.expires = timerCalExpire (DEBUG_TIMER_INTERVER_MSEC) ;
+	myTimer.data = (void *)&myTimer ;
 	myTimer.function = testTimer ;
 
-	testTimer(0) ;
+	testTimer(NULL) ;
 	add_timer (&myTimer) ;
-#endif
+#endif /* DEBUG_TIMER_TEST */
 }
 
 void timerExit(void)

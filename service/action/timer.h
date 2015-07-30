@@ -3,11 +3,11 @@
 
 #include <list.h>
 
-struct timer_list {
+struct TimerList {
 	struct list_head list ;
 	unsigned long expires ;
-	unsigned long data ;
-	void (*function)(unsigned long) ;
+	void *data ;
+	void (*function)(void *) ;
 } ;
 
 void timerInit(void) ;

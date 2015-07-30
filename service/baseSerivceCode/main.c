@@ -15,6 +15,7 @@
 #include "pfevent.h"
 #include "pfwdt.h"
 #include "pfdebug.h"
+#include "pfusignal.h"
 
 #include "event.h"
 #include "notify.h"
@@ -31,6 +32,19 @@
 static int fgRun = 1;
 
 /*****************************************************************************/
+
+static void signalHandler (int signum)
+{
+	DBG("Catched signal, #%d\n", signum) ;
+	if (signum == SIGTERM || signum == SIGINT ) {
+		fgRun = 0 ;
+	}
+}
+static void signalInit (void)
+{
+	PFU_registerSignal(SIGTERM, signalHandler) ;
+	PFU_registerSignal(SIGINT, signalHandler) ;
+}
 
 static void run(void)
 {
@@ -65,6 +79,7 @@ int main(int argc, char **argv)
 	/* XXX : Please change a watchdog mode, EPFWD_MODE_XXXXX */
 	PFWatchdogRegister (argc, argv, EPFWD_MODE_NONE, 30) ;
 
+	signalInit() ;
 	notifyInit() ;
 	eventInit() ;
 	configInit() ;
