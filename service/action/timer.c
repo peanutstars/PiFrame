@@ -8,11 +8,8 @@
 #include "pfuthread.h"
 #include "pfdebug.h"
 
-#include "timer.h"
+#include "pfutimer.h"
 
-
-
-static void reuse_timer (struct TimerList *timer, ETFuncReturn etrv) ;
 
 /*****************************************************************************/
 
@@ -24,13 +21,18 @@ static pthread_t			thid ;
 static int fgRun = 1 ;
 
 struct TimerList {
+	struct list_head entry ;
+	uint32_t key ;
+	int fgRemove ;
 	struct list_head list ;
 	unsigned long expires ;
 	int msec ;
-	int (*timerFunc)(void *) ;
+	ETFReturn (*timerFunc)(void *) ;
 	void *param ;
 	int fgFree ;
 } ;
+
+static void reuse_timer (struct TimerList *timer, ETFReturn etfrv) ;
 
 /*****************************************************************************/
 /*
@@ -58,6 +60,8 @@ static struct timer_vec tv4;
 static struct timer_vec tv3;
 static struct timer_vec tv2;
 static struct timer_vec_root tv1;
+static LIST_HEAD(timerListsRoot) ;
+static uint32_t timerListKey = 0x05092014 ;
 
 static struct timer_vec * const tvecs[] = {
 	(struct timer_vec *)&tv1, &tv2, &tv3, &tv4, &tv5
@@ -181,7 +185,7 @@ repeat:
 		curr = head->next;
 		if (curr != head) {
 			struct TimerList *timer;
-			int (*fn)(void *);
+			ETFReturn (*fn)(void *);
 			void *param;
 
 			timer = list_entry(curr, struct TimerList, list);
@@ -195,7 +199,7 @@ repeat:
 #if 0
 			fn(param); // Call a user defined function.
 #else
-			reuse_timer(timer, fn(param)) ;
+			reuse_timer(timer, (timer->fgRemove ? ETFUNC_RV_DONE : fn(param))) ;
 #endif
 			LOCK_MUTEX(mutex) ;
 			timer_exit();
@@ -229,7 +233,7 @@ static unsigned long inline calculateExpireTime (uint32_t msec)
 	return (jiffies + ((msec/TIMER_TICK_MSEC) ?: 1)) ;
 }
 
-void add_timer (struct TimerList *timer)
+static void add_timer (struct TimerList *timer)
 {
 	LOCK_MUTEX(mutex) ;
 	if (timer_pending(timer)) {
@@ -242,7 +246,8 @@ bug :
 	UNLOCK_MUTEX(mutex) ;
 	ASSERT( ! "Timer Bug !!\n") ;
 }
-int mod_timer(struct TimerList *timer, unsigned long expires)
+#if 0
+static int mod_timer(struct TimerList *timer, unsigned long expires)
 {
 	int rv ;
 	LOCK_MUTEX(mutex) ;
@@ -252,7 +257,7 @@ int mod_timer(struct TimerList *timer, unsigned long expires)
 	UNLOCK_MUTEX(mutex) ;
 	return rv ;
 }
-int del_timer(struct TimerList *timer)
+static int del_timer(struct TimerList *timer)
 {
 	int rv ;
 	LOCK_MUTEX(mutex) ;
@@ -261,22 +266,25 @@ int del_timer(struct TimerList *timer)
 	UNLOCK_MUTEX(mutex) ;
 	return rv ;
 }
-static void reuse_timer (struct TimerList *timer, ETFuncReturn etrv)
+#endif
+static void reuse_timer (struct TimerList *timer, ETFReturn etfrv)
 {
-	if (etrv == ETFUNC_RV_REPEAT) {
+	LOCK_MUTEX(mutex) ;
+	if (etfrv == ETFUNC_RV_REPEAT) {
 		timer->expires = calculateExpireTime(timer->msec) ;
+		UNLOCK_MUTEX(mutex) ;
 		add_timer (timer) ;
 	} else {
 		if (timer->fgFree && timer->param) {
 			free (timer->param) ;
 		}
+		if ( ! timer->fgRemove) {
+			list_del(&timer->entry) ;
+		}
+		UNLOCK_MUTEX(mutex) ;
 		free (timer) ;
 	}
 }
-
-/*****************************************************************************/
-
-
 
 /*****************************************************************************/
 
@@ -297,8 +305,10 @@ static void *timerThread (void *param)
 	return NULL ;
 }
 
+/*****************************************************************************/
+
 #ifdef DEBUG_TIMER_TEST
-int testTimer(void *param)
+ETFReturn testTimer(void *param)
 {
 	static int count = 0;
 	struct timeval tv ;
@@ -327,7 +337,72 @@ void testTimerAdder(int msec)
 }
 #endif /* DEBUG_TIMER_TEST */
 
-void timerInit(void)
+#if 0
+static TimerKey inline getTimerKey (void)
+{
+	return timerListKey ++ ;
+}
+#endif
+
+static struct TimerList *allocTimerItem (int msec, ETFReturn (*func)(void *), void *param, int free)
+{
+	struct TimerList *tl;
+
+	tl = (struct TimerList *) calloc (1, sizeof(*tl)) ;
+	ASSERT(tl) ;
+	
+	INIT_LIST_HEAD(&tl->entry) ;	
+	tl->expires = calculateExpireTime(msec) ;
+	tl->msec = msec ;
+	tl->timerFunc = func ;
+	tl->param = param ;
+	tl->fgFree = free ;
+
+	return tl ;
+}
+
+/*****************************************************************************/
+
+TimerKey PFU_timerAdd (int msec, ETFReturn (*func)(void *), void *param, int free)
+{
+	struct TimerList *tl = allocTimerItem(msec, func, param, free) ;
+	TimerKey key ;
+
+	LOCK_MUTEX(mutex) ;
+	key = tl->key = timerListKey ++ ;
+	list_add(&tl->entry, &timerListsRoot) ;
+	UNLOCK_MUTEX(mutex) ;
+	add_timer(tl) ;
+
+	return key ;
+}
+
+void PFU_timerDelete (TimerKey key)
+{
+	struct TimerList *tl = NULL ;
+	struct list_head *plist ;
+	int fgFound = 0 ;
+
+	if ( ! list_empty(&timerListsRoot)) {
+		LOCK_MUTEX(mutex) ;
+		if ( ! list_empty(&timerListsRoot)) {
+			list_for_each (plist, &timerListsRoot) {
+				tl = list_entry(plist, struct TimerList, list) ;
+				if (tl->key == key) {
+					tl->fgRemove = 1 ;
+					fgFound = 1 ;
+					break;
+				}
+			}
+			if (fgFound) {
+				list_del (&tl->entry) ;
+			}
+		}
+		UNLOCK_MUTEX(mutex) ;
+	}
+}
+
+void PFU_timerInit(void)
 {
 	INIT_SIGNAL(signal) ;
 	INIT_MUTEX(mutex) ;
@@ -335,7 +410,7 @@ void timerInit(void)
 	CREATE_THREAD(thid, timerThread, 0x800, NULL, 1) ;
 }
 
-void timerExit(void)
+void PFU_timerExit(void)
 {
 	fgRun = 0 ;
 	SIGNAL_MUTEX(signal, mutex) ;
