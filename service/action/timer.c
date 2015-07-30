@@ -19,7 +19,6 @@ static void notifyOclock(struct timeval *tv)
 	struct tm tm ;
 	struct PFESystemTime notify ;
 
-	gettimeofday (tv, NULL) ;
 	localtime_r(&tv->tv_sec, &tm) ;
 	notify.year = tm.tm_year + 1900 ;
 	notify.month = tm.tm_mon + 1 ;

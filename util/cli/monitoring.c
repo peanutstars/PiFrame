@@ -56,7 +56,7 @@ static void printSystemEvent(struct EventInfo *ei)
 		BREAK ;
 	CASE(PFE_SYS_TIME) ;
 		struct PFESystemTime *event = (struct PFESystemTime *)ei->event ;
-		snprintf (ei->strBody, sizeof(ei->strBody), "%u.%u.%u %u:%u:%u",
+		snprintf (ei->strBody, sizeof(ei->strBody), "%u.%u.%u %02u:%02u:%02u",
 				event->year, event->month, event->day, event->hour, event->min, event->sec) ;
 		BREAK ;
 	default : 
