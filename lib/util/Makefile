@@ -14,7 +14,8 @@ OBJS			:= utilDebug.o \
 				   utilFile.o \
 				   utilNet.o \
 				   utilSignal.o \
-				   utilSys.o
+				   utilSys.o \
+				   utilTimer.o
 
 INSTALLDIR		:=$(TARGETDIR)/system/lib
 
