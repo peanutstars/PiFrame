@@ -6,12 +6,11 @@
 extern "C" {
 #endif	/*__cplusplus*/
 
-struct VMEConfigRequestExport;
-
-void notifyInit(void);
-void notifyExit(void);
-void notifyConfigUpdate(int klass);
-void notifyReplyNormal (uint32_t key, int result);
+void notifyInit(void) ;
+void notifyExit(void) ;
+void doNotifyBasic (uint32_t eid) ;
+void doNotifyStruct (uint32_t eid, void *edata, int edsize) ;
+void *doRequestStruct (uint32_t eid, void *edata, int edsize, int timeoutSec) ;
 
 #ifdef	__cplusplus
 };

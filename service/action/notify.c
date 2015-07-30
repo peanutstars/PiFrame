@@ -25,28 +25,50 @@ void notifyExit(void)
 	VMQueueClose(eventQ);
 }
 
-void notifyConfigUpdate(int eConfigType)
-{
-	struct PFEConfigUpdate *event;
+/******************************************************************************
+  notify
+ *****************************************************************************/
 
-	DBG("NOTIFY::ConfigUpdate(%d)\n", eConfigType);
-	event = VMQueueGetBuffer(eventQ, sizeof(*event));
-	ASSERT(event);
-	PFE_INIT_EVENT(event, (PFE_CONFIG_UPDATE));
-	event->eConfigType = eConfigType;
-	VMQueuePutBuffer(eventQ, event);
+void doNotifyBasic (uint32_t eid)
+{
+	struct PFEvent *notify;
+
+	notify = VMQueueGetBuffer (eventQ, sizeof(*notify));
+	ASSERT(notify);
+
+	PFE_INIT_EVENT(notify, eid);
+	notify->key = 0;
+
+	VMQueuePutBuffer (eventQ, notify);
 }
 
-void notifyReplyNormal (uint32_t key, int result)
+void doNotifyStruct (uint32_t eid, void *edata, int edsize)
 {
-	struct PFEConfigReplyNormal *event;
-	
-	event = VMQueueGetBuffer(eventQ, sizeof(*event));
-	ASSERT(event);
+	struct PFEvent *notify;
 
-	PFE_INIT_EVENT(event, (PFE_CONFIG_REPLY_NORMAL));
-	event->key = key;
-	event->result = result;
+	notify = VMQueueGetBuffer (eventQ, edsize);
+	ASSERT(notify);
 
-	VMQueuePutBuffer(eventQ, event);
+	memcpy (notify, edata, edsize);
+	PFE_INIT_EVENT(notify, eid);
+	notify->key = 0;
+
+	VMQueuePutBuffer (eventQ, notify);
+}
+
+void *doRequestStruct (uint32_t eid, void *edata, int edsize, int timeoutSec)
+{
+	struct PFEvent *request;
+	void *reply = NULL;
+
+	request = VMQueueGetBuffer(eventQ, edsize);
+	ASSERT (request);
+
+	memcpy (request, edata, edsize) ;
+	PFE_INIT_EVENT(request, eid) ;
+	VMQueueGetKey (eventQ, &request->key) ;
+
+	PFQueryWaitReplyWithPutBuffer (eventQ, request, timeoutSec, &reply);
+
+	return reply;
 }

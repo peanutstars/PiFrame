@@ -55,7 +55,7 @@ typedef enum
 #define	PFE_INIT_EVENT(event, eid)				\
 	do {										\
 		(event)->id = (eid);					\
-		(event)->sec = time(NULL);				\
+		(event)->evtsec = time(NULL);			\
 		(event)->srcPid = (int32_t) getpid();	\
 	} while(0)
 #define PFE_QUERY_ID_START			(100)
@@ -67,8 +67,8 @@ typedef enum
 #define	MKEID(mod, id, type)			__MKEID((mod), (id), sizeof(type), 0)
 #define	MKEIDF(mod, id, type, flag)		__MKEID((mod), (id), sizeof(type), flag) 
 
-#define	__PFE_STRUCT__					uint32_t id; int sec; int32_t srcPid ; uint32_t key
-#define	__PFE_STRUCT_QRV__				uint32_t id; int sec; int32_t srcPid ; uint32_t key; int32_t result
+#define	__PFE_STRUCT__					uint32_t id; int evtsec; int32_t srcPid ; uint32_t key
+#define	__PFE_STRUCT_QRV__				uint32_t id; int evtsec; int32_t srcPid ; uint32_t key; int32_t result
 
 
 /*****************************************************************************/
@@ -115,28 +115,35 @@ struct PFETestLong {
 struct PFESystem {
     __PFE_STRUCT__ ;
 } ;
-
 enum ESYS_SHUTDOWN_TYPE {
 	ESYS_SHUTDOWN_REBOOT       = 0x74800814,
 	ESYS_SHUTDOWN_EXIT,
 } ;
-
 struct PFESystemShutdown {
     __PFE_STRUCT__ ;
     uint32_t	type ;
     uint32_t	waitSecound ;
 } ;
-
+struct PFESystemTime {
+    __PFE_STRUCT__ ;
+	uint32_t	year ;		/* 2015 */
+	uint32_t	month ;		/* 1 ~ 12 */
+	uint32_t	day ;		/* 1 ~ 31 */
+	uint32_t	hour ;		/* 0 ~ 24 */
+	uint32_t	min ;		/* 0 ~ 60 */
+	uint32_t	sec ;		/* 0 ~ 60 */
+} ;
 #define PFE_SYS_DUMMY               MKEID(EPF_MOD_SYSTEM, 0, struct PFESystem)
 #define PFE_SYS_POWER_OFF           MKEID(EPF_MOD_SYSTEM, 1, struct PFESystem)
 #define PFE_SYS_SHUTDOWN            MKEID(EPF_MOD_SYSTEM, 2, struct PFESystemShutdown)
+#define PFE_SYS_TIME				MKEID(EPF_MOD_SYSTEM, 3, struct PFESystemTime)
 
 /******************************************************************************
  * Service Config
  *****************************************************************************/
 struct PFEConfigUpdate {
 	__PFE_STRUCT__;
-	int eConfigType ;
+	uint32_t eConfigType ;
 };
 
 #define PFE_CONFIG_UPDATE			MKEID(EPF_MOD_CONFIG, 0, struct PFEConfigUpdate)

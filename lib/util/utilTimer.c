@@ -443,7 +443,7 @@ void PFU_timerInit(void)
 	INIT_SIGNAL(signal) ;
 	INIT_MUTEX(mutex) ;
 	init_timervecs() ;
-	CREATE_THREAD(thid, timerThread, 0x800, NULL, 1) ;
+	CREATE_THREAD(thid, timerThread, 0x1000, NULL, 1) ;
 }
 
 void PFU_timerExit(void)

@@ -28,7 +28,7 @@ struct EventInfo {
 
 static void sprintEventHeader(struct EventInfo *ei)
 {
-	time_t rawTime = ei->event->sec ;
+	time_t rawTime = ei->event->evtsec ;
 	struct tm tm ;
 	char strTime[16] ;
 
@@ -41,19 +41,24 @@ static void sprintEventHeader(struct EventInfo *ei)
 			PFE_PAYLOAD_SIZE(ei->event->id), PFE_EVENT_FLAG(ei->event->id), ei->event->key) ;
 }
 
-#define CASE(x)		case x : strcat(ei->strEvent, #x)
+#define CASE(x)		case x : { strcat(ei->strEvent, #x)
+#define BREAK		break ; }
 
 static void printSystemEvent(struct EventInfo *ei)
 {
-	struct PFEvent *event = ei->event ;
-	switch (event->id)
+	switch (ei->event->id)
 	{
 	CASE(PFE_SYS_DUMMY) ;	
-		break ;
+		BREAK ;
 	CASE(PFE_SYS_POWER_OFF) ;
-		break ;
+		BREAK ;
 	CASE(PFE_SYS_SHUTDOWN) ;
-		break ;
+		BREAK ;
+	CASE(PFE_SYS_TIME) ;
+		struct PFESystemTime *event = (struct PFESystemTime *)ei->event ;
+		snprintf (ei->strBody, sizeof(ei->strBody), "%u.%u.%u %u:%u:%u",
+				event->year, event->month, event->day, event->hour, event->min, event->sec) ;
+		BREAK ;
 	default : 
 		strcat (ei->strEvent, "SYSTEM") ;
 	}
@@ -61,8 +66,7 @@ static void printSystemEvent(struct EventInfo *ei)
 }
 static void printServiceEvent(struct EventInfo *ei)
 {
-	struct PFEvent *event = ei->event ;
-	switch (event->id)
+	switch (ei->event->id)
 	{
 	default :
 		strcat (ei->strEvent, "SERVICE") ;
@@ -71,15 +75,14 @@ static void printServiceEvent(struct EventInfo *ei)
 }
 static void printConfigEvent(struct EventInfo *ei)
 {
-	struct PFEvent *event = ei->event ;
-	switch (event->id)
+	switch (ei->event->id)
 	{
 	CASE(PFE_CONFIG_UPDATE) ;
-		break ;
+		BREAK ;
 	CASE(PFE_CONFIG_REPLY_NORMAL) ;
-		break ;
+		BREAK ;
 	CASE(PFE_CONFIG_REQUEST_EXPORT) ;
-		break ;
+		BREAK ;
 	default :
 		strcat (ei->strEvent, "CONFIG") ;
 	}
@@ -87,8 +90,7 @@ static void printConfigEvent(struct EventInfo *ei)
 }
 static void printActionEvent(struct EventInfo *ei)
 {
-	struct PFEvent *event = ei->event ;
-	switch (event->id)
+	switch (ei->event->id)
 	{
 	default :
 		strcat (ei->strEvent, "ACTION") ;
