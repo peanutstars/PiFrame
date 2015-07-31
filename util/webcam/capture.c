@@ -25,6 +25,8 @@
 
 #include <linux/videodev2.h>
 
+#include "pfdebug.h"
+
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
 enum io_method {
@@ -45,7 +47,7 @@ struct buffer          *buffers;
 static unsigned int     n_buffers;
 static int              out_buf;
 static int              force_format;
-static int              frame_count = 70;
+static int              frame_count = 1000;
 
 static void errno_exit(const char *s)
 {
@@ -483,19 +485,31 @@ static void init_device(void)
 
         fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if (force_format) {
-                fmt.fmt.pix.width       = 640;
-                fmt.fmt.pix.height      = 480;
-                fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-                fmt.fmt.pix.field       = V4L2_FIELD_INTERLACED;
+				DBG("H264\n") ;
+                fmt.fmt.pix.width       = 640 ;
+                fmt.fmt.pix.height      = 480 ;
+                fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_H264 ;
+                fmt.fmt.pix.field       = V4L2_FIELD_NONE ;
 
                 if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
                         errno_exit("VIDIOC_S_FMT");
 
                 /* Note VIDIOC_S_FMT may change width and height. */
         } else {
+#if 0
                 /* Preserve original settings as set by v4l2-ctl for example */
                 if (-1 == xioctl(fd, VIDIOC_G_FMT, &fmt))
                         errno_exit("VIDIOC_G_FMT");
+#else
+				DBG("MJPEG\n") ;
+                fmt.fmt.pix.width       = 640 ;
+                fmt.fmt.pix.height      = 480 ;
+                fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG ;
+                fmt.fmt.pix.field       = V4L2_FIELD_NONE ;
+
+                if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
+                        errno_exit("VIDIOC_S_FMT");
+#endif
         }
 
         /* Buggy driver paranoia. */
@@ -571,7 +585,7 @@ static void usage(FILE *fp, int argc, char **argv)
                  argv[0], dev_name, frame_count);
 }
 
-static const char short_options[] = "d:hmruofc:";
+static const char short_options[] = "d:hmruof:c:";
 
 static const struct option
 long_options[] = {
@@ -581,7 +595,7 @@ long_options[] = {
         { "read",   no_argument,       NULL, 'r' },
         { "userp",  no_argument,       NULL, 'u' },
         { "output", no_argument,       NULL, 'o' },
-        { "format", no_argument,       NULL, 'f' },
+        { "format", required_argument, NULL, 'f' },
         { "count",  required_argument, NULL, 'c' },
         { 0, 0, 0, 0 }
 };
@@ -629,7 +643,7 @@ int main(int argc, char **argv)
                         break;
 
                 case 'f':
-                        force_format++;
+                        force_format = strtol(optarg, NULL, 0) ;
                         break;
 
                 case 'c':
