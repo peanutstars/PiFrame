@@ -18,8 +18,8 @@
 #include "pfutimer.h"
 
 /*****************************************************************************/
-
 // #define DEBUG_TIMER_TEST	
+
 #define TIMER_TICK_MSEC		(50)
 static pthread_mutex_t		mutex ;
 static pthread_cond_t		signal ;
@@ -294,18 +294,23 @@ static void reuse_timer (struct TimerList *timer, ETFReturn etfrv)
 
 /*****************************************************************************/
 
+#define TS2TICK(x)		(((x.tv_sec*1000)+(x.tv_nsec/1000000))/TIMER_TICK_MSEC)
+
 static void *timerThread (void *param)
 {
 	struct timespec ts;
+	int waitRv ;
 
 	while( fgRun )
 	{
 		SET_SIGNAL_TIME_MSEC(ts, TIMER_TICK_MSEC) ;
 		LOCK_MUTEX(mutex) ;
-		WAIT_SIGNAL_TIMEOUT(signal, mutex, ts) ;
+		waitRv = WAIT_SIGNAL_TIMEOUT(signal, mutex, ts) ;
 		UNLOCK_MUTEX(mutex) ;
 
-		timer_process() ;
+		if (waitRv == ETIMEDOUT) {
+			timer_process() ;
+		}
 	}
 	
 	return NULL ;
