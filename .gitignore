@@ -5,6 +5,7 @@
 *.so
 *.order
 *.mod.c
+core
 drivers/.tmp_versions
 drivers/Module.symvers
 external/bin/iperf
@@ -24,3 +25,4 @@ util/vmq_test/vmq_test
 util/vmqctl/vmqctl
 util/vmshm_test/vmshm_test
 util/vmshmctl/vmshmctl
+util/webcam/capture
