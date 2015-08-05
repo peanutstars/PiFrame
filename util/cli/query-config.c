@@ -122,15 +122,15 @@ static void ConfigRequestExport (int argc, char **argv)
 			DBG("PFE_CONFIG_REQUEST_EXPORT is returned %s(%d)\n", PFQueryGetStrEResult(reply->result), reply->result) ;
 			free (reply) ;
 		} else {
-			ERR("PFE_CONFIG_REQUEST_EXPORT is timeout.\n") ;
+			ERR("Timeout( PFE_CONFIG_REQUEST_EXPORT )\n") ;
 		}
 	} 
 	while( 0 ) ;
 }
 
 struct PFMethod queryConfig[] = {
-	{	"dump",		1,	"<all|system|network|runtime|init>",	ConfigDump,				PFMT_NONE	},
-	{	"export",	2,	"<mask> <path>",						ConfigRequestExport,	PFMT_REPLY	},
+	{	"dump",		1,	"<all|system|network|runtime|init> : dump config",		ConfigDump,				PFMT_NONE	},
+	{	"export",	2,	"<mask> <path> : export a archived file of config",		ConfigRequestExport,	PFMT_REPLY	},
 	{	NULL, }
 };
 

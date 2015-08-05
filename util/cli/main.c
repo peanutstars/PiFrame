@@ -34,6 +34,7 @@ static int g_thrun = 0;
 extern struct PFMethod monitoring[] ;
 extern struct PFMethod notifySystem[] ;
 extern struct PFMethod queryConfig[] ;
+extern struct PFMethod queryService[] ;
 
 struct PFMethodPool {
 	const char *name ;
@@ -44,6 +45,7 @@ struct PFMethodPool methodPool[] = {
 	{	"monitoring",	monitoring		} ,
 	{	"notify",		notifySystem	} ,
 	{	"config",		queryConfig		} ,
+	{	"service",		queryService	} ,
 	{	NULL,							}
 } ;
 

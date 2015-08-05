@@ -14,7 +14,8 @@ OBJS			:= event.o \
 				   main.o \
 				   monitoring.o \
 				   notify-system.o \
-				   query-config.o
+				   query-config.o \
+				   query-service.o
 
 INSTALLDIR		:=$(TARGETDIR)/system/bin
 
