@@ -20,18 +20,22 @@
 static pthread_mutex_t		mutex ;
 static pthread_cond_t		signal ;
 static pthread_t			thid ;
-static PFUFifo				*queueHandle ;
+static PFUFifo				*queueHandle = NULL ;
 static int fgRun = 1 ;
 
 /*****************************************************************************/
 
 static int doServiceEvent (struct PFEvent *event)
 {
-	struct PFEServiceSystem *sysevent ;
+	struct PFEServiceSystem *sysevent = (struct PFEServiceSystem *) event ;
 	char cmd[MAX_COMMAND_LENGTH] ;
 	int fgRequest = 0 ;
 	int resultSystem = 0 ;
+	int errorNumber = 0 ;
 
+//	DBG("req->eCmdType  : %d\n", sysevent->eCmdType) ;
+//	DBG("req->command   : %s\n", sysevent->command) ;
+//	DBG("req->resultPath: %s\n", sysevent->resultPath) ;
 	switch (event->id)
 	{
 	case PFE_SERVICE_REQUEST_COMMAND :
@@ -39,7 +43,6 @@ static int doServiceEvent (struct PFEvent *event)
 			fgRequest = 1 ;
 		}
 	case PFE_SERVICE_SYSTEM :
-		sysevent = (struct PFEServiceSystem *) event ;
 		snprintf (cmd, sizeof(cmd), "%s ", sysevent->command) ;
 		if (sysevent->resultPath[0] != '\0') {
 			strcat(cmd, "> ") ;
@@ -56,10 +59,16 @@ static int doServiceEvent (struct PFEvent *event)
 
 	DBG("CMD : %s\n", cmd) ;
 	resultSystem = system(cmd) ;
+	if (resultSystem == -1) {
+		errorNumber = errno ;
+		ERR2("system(failed)\n") ;
+	}
 
 	if (fgRequest) {
 		struct PFEServiceReplyCommand reply ;
+		reply.result = ERV_OK ;
 		reply.resultSystem = resultSystem ;
+		reply.errorNumber = errorNumber ;
 		doReplyStruct(PFE_SERVICE_REPLY_COMMAND, event->key, &reply, sizeof(reply)) ;
 	}
 
@@ -69,8 +78,8 @@ static int doServiceEvent (struct PFEvent *event)
 /*****************************************************************************/
 static void *serviceThread (void *param)
 {
-	struct timespec ts;
-	void *event ;
+	struct timespec ts ;
+	void *data ;
 
 	while( fgRun )
 	{
@@ -79,10 +88,10 @@ static void *serviceThread (void *param)
 		WAIT_SIGNAL_TIMEOUT(signal, mutex, ts) ;
 		UNLOCK_MUTEX(mutex) ;
 
-		event = PFU_dequeueFIFO(queueHandle) ;
-		if (event) {
-			doServiceEvent(event) ;
-			free(event) ;
+		data = PFU_dequeueFIFO(queueHandle) ;
+		if (data) {
+			doServiceEvent(data) ;
+			free(data) ;
 		}
 	}
 	
@@ -96,7 +105,7 @@ void serviceInit(void)
 	INIT_SIGNAL(signal) ;
 	INIT_MUTEX(mutex) ;
 	queueHandle = PFU_createFIFO(SERVICE_FIFO_COUNT) ;
-	CREATE_THREAD(thid, serviceThread, 0x800, NULL, 1) ;
+	CREATE_THREAD(thid, serviceThread, 0x1000, NULL, 1) ;
 }
 
 void serviceExit(void)
@@ -108,8 +117,8 @@ void serviceExit(void)
 
 void serviceAddQueue (struct PFEvent *event)
 {
-	PFU_enqueueFIFO(queueHandle, (void *)event, PFE_PAYLOAD_SIZE(event->id)) ;
-	LOCK_MUTEX(mutex) ;
+	if (queueHandle) {
+		PFU_enqueueFIFO(queueHandle, (void *)event, PFE_PAYLOAD_SIZE(event->id)) ;
+	}
 	SIGNAL_MUTEX(signal, mutex) ;
-	UNLOCK_MUTEX(mutex) ;
 }

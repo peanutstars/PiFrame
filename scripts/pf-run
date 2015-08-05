@@ -64,10 +64,12 @@ fRunService() {
 }
 
 fStartService() {
-	fEcho "Start SERVICE !!"
+	fEcho "Starting SERVICE !!"
 	fRunService svc.config
 	fWait 10 fGetConfigInit		# Wait a config loading to done
+	fRunService svc.service
 	fRunService svc.action
+	fEcho "Started All SERVICE."
 }
 
 fStopService() {

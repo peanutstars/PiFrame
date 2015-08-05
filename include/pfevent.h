@@ -189,6 +189,7 @@ struct PFEServiceRequestCommand {
 struct PFEServiceReplyCommand {
 	__PFE_STRUCT_QRV__ ;
 	int32_t			resultSystem ;
+	int32_t			errorNumber ;
 } ;
 
 #define PFE_SERVICE_REPLY			MKEIDF(EPF_MOD_SERVICE, 100, struct PFEServiceReply,			PFE_FLAG_REPLY)

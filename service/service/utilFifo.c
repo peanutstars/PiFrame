@@ -71,7 +71,7 @@ static void freeQItem (struct PFQueue *pfq, QItem *item)
 	} else {
 		LOCK_MUTEX(pfq->mutex) ;
 		list_add_tail(&item->list, &pfq->emptyRoot) ;
-		SIGNAL_MUTEX(pfq->signal, pfq->mutex) ;
+		SIGNAL(pfq->signal) ;
 		UNLOCK_MUTEX(pfq->mutex) ;
 	}
 }
@@ -148,8 +148,8 @@ void PFU_enqueueFIFO (PFUFifo *handle, void *data, int size)
 		item = allocQItem(pfq) ;
 		if (item == NULL) {
 			struct timespec ts ;
-			SET_SIGNAL_TIME_MSEC(ts, 1000) ;
 			DBG(HL_CYAN "FIFO Item is empty and waiting Item ... %d" HL_NONE "\n", ++retryCount) ;
+			SET_SIGNAL_TIME_MSEC(ts, 1000) ;
 			LOCK_MUTEX(pfq->mutex) ;
 			WAIT_SIGNAL_TIMEOUT(pfq->signal, pfq->mutex, ts) ;
 			UNLOCK_MUTEX(pfq->mutex) ;
