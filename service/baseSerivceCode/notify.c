@@ -2,9 +2,10 @@
 
 #include "vmq.h"
 #include "pfevent.h"
+#include "pfquery.h"
+#include "pfdebug.h"
 
 #include "notify.h"
-#include "pfdebug.h"
 
 /*****************************************************************************/
 

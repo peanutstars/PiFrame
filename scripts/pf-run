@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PFCMD="$1"
 BASEDIR=/system
@@ -9,8 +9,45 @@ SCRDIR=$BASEDIR/scripts
 DEFDIR=$BASEDIR/default
 SUDO=
 
+COLOR_YELLOW="\033[33m"
+COLOR_GREEN="\033[32m"
+COLOR_NONE="\033[0m"
+
+
 fEcho() {
-	echo -e "!! $1"
+	echo -e "${COLOR_YELLOW}@@ $1 @@${COLOR_NONE}"
+}
+
+fGetCurTime() {
+	echo `cat /proc/uptime | awk '{ print $1 }' | sed 's/\.//g'`
+}
+
+
+fWait() {
+	local _timeout=${1}00
+	local _expire=0
+	local _rv=0
+
+	let "_expire = `fGetCurTime` + _timeout"
+	fEcho "Waiting Start $2 : `fGetCurTime` - $_timeout"
+	while [ "`fGetCurTime`" -le "$_expire" ] ;
+	do
+		_rv=$($2)
+		if [ "$_rv" -eq "1" ] ; then
+			break
+		fi
+		sleep 1
+	done
+	fEcho "Waiting End $2 : `fGetCurTime`"
+}
+
+fGetConfigInit() {
+	local _rv=`cli config dump init | grep 'init='`
+	if [ "$_rv" == "init=1" ] ; then
+		echo "1"
+	else
+		echo "0"
+	fi
 }
 
 fLoadDriver() {
@@ -27,12 +64,14 @@ fRunService() {
 }
 
 fStartService() {
-	fEcho "Start SERVICE !!\n"
+	fEcho "Start SERVICE !!"
 	fRunService svc.config
+	fWait 10 fGetConfigInit		# Wait a config loading to done
+	fRunService svc.action
 }
 
 fStopService() {
-	fEcho "Stop SERVICE !!\n"
+	fEcho "Stop SERVICE !!"
 }
 
 fInit() {

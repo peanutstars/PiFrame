@@ -80,16 +80,18 @@ static void ConfigDump (int argc, char **argv)
 	PFConfigPut(pConfig) ;
 
 	if ( ! strcmp(argv[0], "runtime")) {
-		DumpConfigRuntime (config) ;
+		DumpConfigRuntime(config) ;
 	} else if ( ! strcmp(argv[0], "system")) {
-		DumpConfigSystem (config) ;
+		DumpConfigSystem(config) ;
 	} else if ( ! strcmp(argv[0], "network")) {
-		DumpConfigNetwork (config) ;
+		DumpConfigNetwork(config) ;
 	} else if ( ! strcmp(argv[0], "all")) {
-		DumpConfigBase (config) ;
-		DumpConfigSystem (config) ;
-		DumpConfigNetwork (config) ;
-		DumpConfigRuntime (config) ;
+		DumpConfigBase(config) ;
+		DumpConfigSystem(config) ;
+		DumpConfigNetwork(config) ;
+		DumpConfigRuntime(config) ;
+	} else if ( ! strcmp(argv[0], "init")) {
+		printf("init=%d\n", config->initialized) ;
 	} else {
 		ERR("Not support parameter : %s\n", argv[0]) ;
 	}
@@ -127,7 +129,7 @@ static void ConfigRequestExport (int argc, char **argv)
 }
 
 struct PFMethod queryConfig[] = {
-	{	"dump",		1,	"<all|system|network|runtime>",			ConfigDump,				PFMT_NONE	},
+	{	"dump",		1,	"<all|system|network|runtime|init>",	ConfigDump,				PFMT_NONE	},
 	{	"export",	2,	"<mask> <path>",						ConfigRequestExport,	PFMT_REPLY	},
 	{	NULL, }
 };

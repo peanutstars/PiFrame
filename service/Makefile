@@ -8,7 +8,8 @@ include $(BASEDIR)/Rules.mk
 
 SUBDIRS		:= watchdog \
 			   config \
-			   action
+			   action \
+			   service
 
 #------------------------------------------------------------------------------
 
