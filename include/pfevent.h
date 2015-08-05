@@ -142,23 +142,50 @@ struct PFESystemTime {
  * Service Config
  *****************************************************************************/
 struct PFEConfigUpdate {
-	__PFE_STRUCT__;
+	__PFE_STRUCT__ ;
 	uint32_t eConfigType ;
-};
+} ;
 
 #define PFE_CONFIG_UPDATE			MKEID(EPF_MOD_CONFIG, 0, struct PFEConfigUpdate)
 
 struct PFEConfigReplyNormal {
-	__PFE_STRUCT_QRV__;
-};
+	__PFE_STRUCT_QRV__ ;
+} ;
 struct PFEConfigRequestExport {
-	__PFE_STRUCT__;
-	uint32_t	mask;
-	char path[MAX_PATH_LENGTH];
-};
+	__PFE_STRUCT__ ;
+	uint32_t	mask ;
+	char path[MAX_PATH_LENGTH] ;
+} ;
 
 #define PFE_CONFIG_REPLY_NORMAL		MKEIDF(EPF_MOD_CONFIG, 100, struct PFEConfigReplyNormal,   PFE_FLAG_REPLY)
 #define PFE_CONFIG_REQUEST_EXPORT	MKEIDF(EPF_MOD_CONFIG, 101, struct PFEConfigRequestExport, PFE_FLAG_NONE)
+
+/******************************************************************************
+ * Service Service
+ *****************************************************************************/
+struct PFEServiceSystem {
+	__PFE_STRUCT__ ;
+	char command[MAX_COMMAND_LENGTH] ;
+	char resultPath[MAX_BASE_PATH_LENGTH] ;
+} ;
+
+#define PFE_SERVICE_SYSTEM			MKEID(EPF_MOD_SERVICE, 0, struct PFEServiceSystem)
+
+struct PFEServiceReply {
+	__PFE_STRUCT_QRV__ ;
+} ;
+struct PFEServiceRequestCommand {
+	__PFE_STRUCT__ ;
+	char command[MAX_COMMAND_LENGTH] ;
+} ;
+struct PFEServiceReplyCommand {
+	__PFE_STRUCT_QRV__ ;
+	int32_t status ;
+} ;
+
+#define PFE_SERVICE_REPLY			MKEIDF(EPF_MOD_SERVICE, 100, struct PFEServiceReply,			PFE_FLAG_REPLY)
+#define PFE_SERVICE_REQUEST_COMMAND	MKEIDF(EPF_MOD_SERVICE, 101, struct PFEServiceRequestCommand,	PFE_FLAG_NONE)
+#define PFE_SERVICE_REPLY_COMMAND	MKEIDF(EPF_MOD_SERVICE, 102, struct PFEServiceReplyCommand,		PFE_FLAG_REPLY)
 
 /******************************************************************************
  * other events

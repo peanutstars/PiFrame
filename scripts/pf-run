@@ -32,11 +32,11 @@ fWait() {
 	fEcho "Waiting Start $2 : `fGetCurTime` - $_timeout"
 	while [ "`fGetCurTime`" -le "$_expire" ] ;
 	do
+		sleep 1
 		_rv=$($2)
 		if [ "$_rv" -eq "1" ] ; then
 			break
 		fi
-		sleep 1
 	done
 	fEcho "Waiting End $2 : `fGetCurTime`"
 }
