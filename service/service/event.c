@@ -9,6 +9,7 @@
 #include "pfdebug.h"
 
 #include "config.h"
+#include "service.h"
 
 /*****************************************************************************/
 
@@ -63,6 +64,11 @@ static int eventHandlerSystem (struct PFEvent *event)
 	return run ;
 }
 
+static void eventHandlerService (struct PFEvent *event)
+{
+	serviceAddQueue(event) ;
+}
+
 int eventHandler(void)
 {
 	int run = 1;
@@ -75,8 +81,9 @@ int eventHandler(void)
 		EPfModule moduleId  = PFE_MODULE_ID(event->id);
 		switch (moduleId)
 		{
-			case EPF_MOD_SYSTEM:	run = eventHandlerSystem (event);		break;
-			case EPF_MOD_CONFIG:	eventHandlerConfig (event);				break;
+			case EPF_MOD_SYSTEM:	run = eventHandlerSystem(event);		break;
+			case EPF_MOD_CONFIG:	eventHandlerConfig(event);				break;
+			case EPF_MOD_SERVICE:	eventHandlerService(event);				break;
 			default:
 				break;
 		}

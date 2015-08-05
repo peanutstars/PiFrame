@@ -163,10 +163,16 @@ struct PFEConfigRequestExport {
 /******************************************************************************
  * Service Service
  *****************************************************************************/
+enum ESVC_CMD_TYPE {
+	ESVC_CMD_FOREGROUND = 0,
+	ESVC_CMD_BACKGROUND,
+	ESVC_CMD_END
+} ;
 struct PFEServiceSystem {
 	__PFE_STRUCT__ ;
-	char command[MAX_COMMAND_LENGTH] ;
-	char resultPath[MAX_BASE_PATH_LENGTH] ;
+	uint32_t		eCmdType ;
+	char			command[MAX_COMMAND_LENGTH] ;
+	char			resultPath[MAX_BASE_PATH_LENGTH] ;
 } ;
 
 #define PFE_SERVICE_SYSTEM			MKEID(EPF_MOD_SERVICE, 0, struct PFEServiceSystem)
@@ -176,11 +182,13 @@ struct PFEServiceReply {
 } ;
 struct PFEServiceRequestCommand {
 	__PFE_STRUCT__ ;
-	char command[MAX_COMMAND_LENGTH] ;
+	uint32_t		eCmdType ;
+	char			command[MAX_COMMAND_LENGTH] ;
+	char			resultPath[MAX_BASE_PATH_LENGTH] ;
 } ;
 struct PFEServiceReplyCommand {
 	__PFE_STRUCT_QRV__ ;
-	int32_t status ;
+	int32_t			resultSystem ;
 } ;
 
 #define PFE_SERVICE_REPLY			MKEIDF(EPF_MOD_SERVICE, 100, struct PFEServiceReply,			PFE_FLAG_REPLY)

@@ -73,3 +73,17 @@ void *doRequestStruct (uint32_t eid, void *edata, int edsize, int timeoutSec)
 
 	return reply;
 }
+
+void doReplyStruct (uint32_t eid, uint32_t key, void *edata, int edsize)
+{
+	struct PFEvent *notify;
+
+	notify = VMQueueGetBuffer (eventQ, edsize);
+	ASSERT(notify);
+
+	memcpy (notify, edata, edsize);
+	PFE_INIT_EVENT(notify, eid);
+	notify->key = key ;
+
+	VMQueuePutBuffer (eventQ, notify);
+}
