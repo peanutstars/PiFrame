@@ -15,7 +15,8 @@ OBJS			:= event.o \
 				   monitoring.o \
 				   notify-system.o \
 				   query-config.o \
-				   query-service.o
+				   query-service.o \
+				   enum2str.o 
 
 INSTALLDIR		:=$(TARGETDIR)/system/bin
 

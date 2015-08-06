@@ -12,6 +12,8 @@
 #include "method.h"
 #include "pfdebug.h"
 
+#include "enum2str.h"
+
 static int _fgRunMonitoring = 0 ;
 
 int isMonitoring (void)
@@ -23,7 +25,7 @@ struct EventInfo {
 	struct PFEvent *event ;
 	char strHeader[64] ;
 	char strEvent[32] ;
-	char strBody[512] ;
+	char strBody[768] ;
 } ;
 
 static void sprintEventHeader(struct EventInfo *ei)
@@ -68,16 +70,35 @@ static void printServiceEvent(struct EventInfo *ei)
 {
 	switch (ei->event->id)
 	{
+	CASE(PFE_SERVICE_SYSTEM) ;
+		struct PFEServiceSystem *event = (struct PFEServiceSystem *)ei->event ;
+		snprintf(ei->strBody, sizeof(ei->strBody), "T:%d C:%s R:%s",
+				event->eCmdType, event->command, event->resultPath) ;
+		BREAK ;
+	CASE(PFE_SERVICE_REQUEST_COMMAND) ;
+		struct PFEServiceSystem *event = (struct PFEServiceSystem *)ei->event ;
+		snprintf(ei->strBody, sizeof(ei->strBody), "T:%d C:%s R:%s",
+				event->eCmdType, event->command, event->resultPath) ;
+		BREAK ;
+	CASE(PFE_SERVICE_REPLY_COMMAND) ;
+		struct PFEServiceReplyCommand *reply = (struct PFEServiceReplyCommand *)ei->event ;
+		snprintf (ei->strBody, sizeof(ei->strBody), "QR:%d resultSystem:%d(%Xh), errorNumber:%d\n", 
+				reply->result, reply->resultSystem, reply->resultSystem, reply->errorNumber) ;
+		BREAK ;
 	default :
 		strcat (ei->strEvent, "SERVICE") ;
 	}
 	printf ("%s %s %s\n", ei->strHeader, ei->strEvent, ei->strBody) ;
 }
+
+
 static void printConfigEvent(struct EventInfo *ei)
 {
 	switch (ei->event->id)
 	{
 	CASE(PFE_CONFIG_UPDATE) ;
+		struct PFEConfigUpdate *event = (struct PFEConfigUpdate *) ei->event ;
+		snprintf (ei->strBody, sizeof(ei->strBody), "eConfigType:%u,%s\n", event->eConfigType, getStrConfigType(event->eConfigType)) ;
 		BREAK ;
 	CASE(PFE_CONFIG_REPLY_NORMAL) ;
 		BREAK ;
