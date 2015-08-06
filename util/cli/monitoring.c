@@ -72,13 +72,13 @@ static void printServiceEvent(struct EventInfo *ei)
 	{
 	CASE(PFE_SERVICE_SYSTEM) ;
 		struct PFEServiceSystem *event = (struct PFEServiceSystem *)ei->event ;
-		snprintf(ei->strBody, sizeof(ei->strBody), "T:%d C:%s R:%s",
-				event->eCmdType, event->command, event->resultPath) ;
+		snprintf(ei->strBody, sizeof(ei->strBody), "T:%s C:'%s' R:%s",
+				getStrServiceCommandType(event->eCmdType), event->command, event->resultPath) ;
 		BREAK ;
 	CASE(PFE_SERVICE_REQUEST_COMMAND) ;
 		struct PFEServiceSystem *event = (struct PFEServiceSystem *)ei->event ;
-		snprintf(ei->strBody, sizeof(ei->strBody), "T:%d C:%s R:%s",
-				event->eCmdType, event->command, event->resultPath) ;
+		snprintf(ei->strBody, sizeof(ei->strBody), "T:%s C:'%s' R:%s",
+				getStrServiceCommandType(event->eCmdType), event->command, event->resultPath) ;
 		BREAK ;
 	CASE(PFE_SERVICE_REPLY_COMMAND) ;
 		struct PFEServiceReplyCommand *reply = (struct PFEServiceReplyCommand *)ei->event ;

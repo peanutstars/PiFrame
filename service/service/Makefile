@@ -11,7 +11,6 @@ OBJS			:= event.o \
 				   notify.o \
 				   config.o \
 				   service.o \
-				   utilFifo.o \
 				   main.o
 
 INSTALLDIR		:=$(TARGETDIR)/system/bin

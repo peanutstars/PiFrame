@@ -27,6 +27,7 @@ static int fgRun = 1 ;
 
 static int doServiceEvent (struct PFEvent *event)
 {
+	static uint32_t cmdCount = 0 ;
 	struct PFEServiceSystem *sysevent = (struct PFEServiceSystem *) event ;
 	char cmd[MAX_COMMAND_LENGTH] ;
 	int fgRequest = 0 ;
@@ -57,7 +58,7 @@ static int doServiceEvent (struct PFEvent *event)
 		ERR("Unknown Service Event.\n") ;
 	}
 
-	DBG("CMD : %s\n", cmd) ;
+	DBG("CMD%d : %s\n", ++cmdCount, cmd) ;
 	resultSystem = system(cmd) ;
 	if (resultSystem == -1) {
 		errorNumber = errno ;
@@ -88,10 +89,11 @@ static void *serviceThread (void *param)
 		WAIT_SIGNAL_TIMEOUT(signal, mutex, ts) ;
 		UNLOCK_MUTEX(mutex) ;
 
-		data = PFU_dequeueFIFO(queueHandle) ;
-		if (data) {
-			doServiceEvent(data) ;
-			free(data) ;
+		while( fgRun && (data = PFU_dequeueFIFO(queueHandle))) {
+			if (data) {
+				doServiceEvent(data) ;
+				free(data) ;
+			}
 		}
 	}
 	
