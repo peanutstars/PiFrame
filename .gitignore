@@ -5,6 +5,7 @@
 *.so
 *.order
 *.mod.c
+*.pyc
 core
 drivers/.tmp_versions
 drivers/Module.symvers
