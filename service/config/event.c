@@ -45,7 +45,7 @@ static void eventHandlerConfig (struct PFEvent *event)
 {
 	switch (event->id)
 	{
-		case	PFE_CONFIG_REQUEST_EXPORT:
+	case PFE_CONFIG_REQUEST_EXPORT :
 		{
 			struct PFEConfigRequestExport *request = (struct PFEConfigRequestExport *)event;
 			int result = configExport (request->mask, request->path);
@@ -62,14 +62,27 @@ static int eventHandlerSystem (struct PFEvent *event)
 	int run = 1;
 	switch (event->id)
 	{
-		case	PFE_SYS_POWER_OFF:
-			run = 0 ;
-			break ;
-		case	PFE_SYS_SHUTDOWN:
-			run = 0 ;
-			break;
+	case	PFE_SYS_POWER_OFF :
+		run = 0 ;
+		break ;
+	case	PFE_SYS_SHUTDOWN :
+		run = 0 ;
+		break;
 	}
 	return run ;
+}
+
+static void eventHandlerService (struct PFEvent *event)
+{
+	switch(event->id)
+	{
+	case PFE_SERVICE_UPDATE_RUNTIME : 
+		{
+			struct PFEServcieUpdateRuntime *runtime = (struct PFEServcieUpdateRuntime *) event ;
+			updateConfigRuntimeService(&runtime->runtimeService) ;
+			break ;
+		}
+	}
 }
 
 int configEventHandler(void)
@@ -84,8 +97,9 @@ int configEventHandler(void)
 		EPfModule moduleId  = PFE_MODULE_ID(event->id);
 		switch (moduleId)
 		{
-			case EPF_MOD_SYSTEM:	run = eventHandlerSystem (event);		break;
-			case EPF_MOD_CONFIG:	eventHandlerConfig (event);				break;
+			case EPF_MOD_SYSTEM:	run = eventHandlerSystem(event) ;		break;
+			case EPF_MOD_CONFIG:	eventHandlerConfig(event) ;				break;
+			case EPF_MOD_SERVICE:	eventHandlerService(event) ;			break;
 			default:
 				break;
 		}

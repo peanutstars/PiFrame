@@ -13,6 +13,7 @@ OBJS			:= config.o \
 				   config-util.o \
 				   config-system.o \
 				   config-network.o \
+				   config-runtime.o \
 				   main.o
 
 INSTALLDIR		:=$(TARGETDIR)/system/bin

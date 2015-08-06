@@ -12,16 +12,24 @@
 #include "pfdebug.h"
 
 #include "notify.h"
+#include "service.h"
+
+struct ServiceInfo {
+	PFUFifo					*queueHandle ;
+	struct PFRuntimeService runtimeService ;
+} ;
+typedef struct ServiceInfo ServiceInfo ;
 
 /*****************************************************************************/
 
-#define SERVICE_FIFO_COUNT	(5)
+#define SERVICE_FIFO_SIZE (5)
 
 static pthread_mutex_t		mutex ;
 static pthread_cond_t		signal ;
 static pthread_t			thid ;
-static PFUFifo				*queueHandle = NULL ;
 static int fgRun = 1 ;
+
+static ServiceInfo			_serviceInfo ;
 
 /*****************************************************************************/
 
@@ -89,7 +97,7 @@ static void *serviceThread (void *param)
 		WAIT_SIGNAL_TIMEOUT(signal, mutex, ts) ;
 		UNLOCK_MUTEX(mutex) ;
 
-		while( fgRun && (data = PFU_dequeueFIFO(queueHandle))) {
+		while( fgRun && (data = PFU_dequeueFIFO(_serviceInfo.queueHandle))) {
 			if (data) {
 				doServiceEvent(data) ;
 				free(data) ;
@@ -106,21 +114,30 @@ void serviceInit(void)
 {
 	INIT_SIGNAL(signal) ;
 	INIT_MUTEX(mutex) ;
-	queueHandle = PFU_createFIFO(SERVICE_FIFO_COUNT) ;
+	memset (&_serviceInfo, 0, sizeof(_serviceInfo)) ;
+	_serviceInfo.runtimeService.fifoSize = SERVICE_FIFO_SIZE ;
+	_serviceInfo.queueHandle = PFU_createFIFO(SERVICE_FIFO_SIZE) ;
 	CREATE_THREAD(thid, serviceThread, 0x1000, NULL, 1) ;
+	serviceNotifyRuntime() ;
 }
 
 void serviceExit(void)
 {
 	fgRun = 0 ;
 	SIGNAL_MUTEX(signal, mutex) ;
-
 }
 
 void serviceAddQueue (struct PFEvent *event)
 {
-	if (queueHandle) {
-		PFU_enqueueFIFO(queueHandle, (void *)event, PFE_PAYLOAD_SIZE(event->id)) ;
+	if (_serviceInfo.queueHandle) {
+		PFU_enqueueFIFO(_serviceInfo.queueHandle, (void *)event, PFE_PAYLOAD_SIZE(event->id)) ;
 	}
 	SIGNAL_MUTEX(signal, mutex) ;
+}
+
+void serviceNotifyRuntime (void)
+{
+	struct PFEServcieUpdateRuntime notify ;
+	memcpy(&notify.runtimeService, &_serviceInfo.runtimeService, sizeof(struct PFRuntimeService)) ;
+	doNotifyStruct(PFE_SERVICE_UPDATE_RUNTIME, &notify, sizeof(notify)) ;
 }

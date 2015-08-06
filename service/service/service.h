@@ -6,5 +6,6 @@ struct PFEvent ;
 void serviceInit(void) ;
 void serviceExit(void) ;
 void serviceAddQueue (struct PFEvent *event) ;
+void serviceNotifyRuntime (void) ;
 
 #endif /* ___SERVICE_H___ */

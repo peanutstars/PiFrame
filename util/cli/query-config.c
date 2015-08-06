@@ -69,7 +69,9 @@ static void DumpConfigNetwork (const struct PFConfig *config)
 }
 static void DumpConfigRuntime (const struct PFConfig *config)
 {
-	printf ("Nothing ...\n") ;
+	const struct PFRuntimeService *service = &config->runtime.service ;
+	printf ("<<<< config.runtime.service >>>>\n") ;
+	printf ("fifoSize           : %d\n", service->fifoSize) ;
 }
 static void ConfigDump (int argc, char **argv)
 {

@@ -174,8 +174,13 @@ struct PFEServiceSystem {
 	char			command[MAX_COMMAND_LENGTH] ;
 	char			resultPath[MAX_BASE_PATH_LENGTH] ;
 } ;
+struct PFEServcieUpdateRuntime {
+	__PFE_STRUCT__ ;
+	struct PFRuntimeService		runtimeService ;
+} ;
 
 #define PFE_SERVICE_SYSTEM			MKEID(EPF_MOD_SERVICE, 0, struct PFEServiceSystem)
+#define PFE_SERVICE_UPDATE_RUNTIME	MKEID(EPF_MOD_SERVICE, 1, struct PFEServcieUpdateRuntime) 
 
 struct PFEServiceReply {
 	__PFE_STRUCT_QRV__ ;

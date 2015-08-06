@@ -66,7 +66,13 @@ static int eventHandlerSystem (struct PFEvent *event)
 
 static void eventHandlerService (struct PFEvent *event)
 {
-	serviceAddQueue(event) ;
+	switch (event->id)
+	{
+	case PFE_SERVICE_SYSTEM :
+	case PFE_SERVICE_REQUEST_COMMAND :
+		serviceAddQueue(event) ;
+		break ;
+	}
 }
 
 int eventHandler(void)

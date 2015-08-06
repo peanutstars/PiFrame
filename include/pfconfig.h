@@ -70,8 +70,8 @@ enum ENET_CONNECTION_TYPE {
 } ;
 
 struct PFConfigNetworkBasic {
-    unsigned int netif ;
-	unsigned int type ;
+    uint32_t	netif ;
+	uint32_t	type ;
 	char devWired[MAX_DUMMY_LENGTH] ;
 } ;
 
@@ -89,9 +89,13 @@ struct PFConfigNetwork {
 } ;
 
 /*****************************************************************************/
+struct PFRuntimeService {
+	uint32_t	fifoSize;
+} ;
 struct PFConfigRuntime {
 	// TODO : Add data for runtime.
 	int runtime ;
+	struct PFRuntimeService		service ;
 } ;
 /*****************************************************************************/
 
