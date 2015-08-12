@@ -60,7 +60,7 @@ class TestFifo :
 		# print 'CLI :', self.cli ;
 		self.cmd = [ [ self.cli, 'service', 'cmd', cmdFg, 'fg' ],
 							[ self.cli, 'service', 'cmd', cmdBg, 'bg' ] ] ;
-	def sendSystem(self, cmd) :
+	def notifySystem(self, cmd) :
 		strCmd = '%0*d' % (3, self.__sendCount) + '] ';
 		self.__sendCount += 1 ;
 		for sc in cmd :
@@ -72,11 +72,11 @@ class TestFifo :
 		print 'Run a foreground command lists :', self.cmd[SysMode.FG] ;
 		print 'Run a background command lists :', self.cmd[SysMode.BG] ;
 		for i in range(0, 3) :
-			self.sendSystem(self.cmd[SysMode.FG]) ;
+			self.notifySystem(self.cmd[SysMode.FG]) ;
 		for i in range(0, 9) :
-			self.sendSystem(self.cmd[SysMode.BG]) ;
+			self.notifySystem(self.cmd[SysMode.BG]) ;
 		for i in range(0, 3) :
-			self.sendSystem(self.cmd[SysMode.FG]) ;
+			self.notifySystem(self.cmd[SysMode.FG]) ;
 
 
 def main() :

@@ -1,0 +1,58 @@
+#!/bin/bash
+
+[ -z "$CROSS_COMPILE" ] && CROSS_COMPILE=arm-xilinx-linux-gnueabi-
+[ -z "$BUILD_HOST" ] && BUILD_HOST=arm-xilinx-linux-gnueabi
+[ -z "$CORES" ] && CORES=`cat /proc/cpuinfo | grep process | wc -l`
+
+ARCHIVE_FILE=ffmpeg-2.6.2.tar.bz2
+SRC_DIR=ffmpeg-2.6.2
+
+extract_archive() {
+	tar xjvf $ARCHIVE_FILE
+	if [ ."$?" != ."0" ]; then
+		echo "# Archive extrace error !!"
+		exit 1
+	fi
+}
+
+build_source() {
+	PREFIX=`pwd`/../../
+	./configure \
+				--prefix=$PREFIX \
+				--extra-cflags="-I$PREFIX/include" \
+				--extra-ldflags="-L$PREFIX/lib" \
+				--enable-cross-compile \
+				--cross-prefix=${CROSS_COMPILE} \
+				--cc=${CROSS_COMPILE}gcc \
+				--host-cc=${CROSS_COMPILE}gcc \
+				--arch=armel \
+				--target-os=linux \
+				--enable-shared \
+				--disable-static \
+				--disable-doc \
+				--disable-indevs \
+				--disable-outdevs \
+				--enable-gpl --enable-version3 \
+		&& make -j ${CORES}
+	if [ ."$?" != ."0" ]; then
+		echo "# Build Error !!"
+		exit 1
+	fi
+}
+
+install_source() {
+	make install
+}
+
+remove_extrace() {
+	rm -rf $SRC_DIR
+}
+
+# Start
+extract_archive
+cd $SRC_DIR
+build_source
+install_source
+cd -
+remove_extrace
+
